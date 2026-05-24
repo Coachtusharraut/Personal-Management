@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_launcher_round.xml - Premium Round Adaptive Launcher Configuration for Coach Tushar -->
+<!-- Configures circular adaptive launcher shape support with the obsidian gold gradient and transparent face PNG -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Links to the custom vector gradient background defined in drawable/ic_launcher_background.xml -->
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <!-- Links to the density-specific rescaled circular transparent face PNG defined in mipmap/ic_launcher_foreground.png -->
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>

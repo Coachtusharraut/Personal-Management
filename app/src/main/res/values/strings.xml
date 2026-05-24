@@ -1,0 +1,4 @@
+<resources>
+    <!-- Change the application name display string to Coach Tushar for personalized elite branding -->
+    <string name="app_name">Coach Tushar</string>
+</resources>
