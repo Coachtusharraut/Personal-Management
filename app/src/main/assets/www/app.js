@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnConnectGoogle = document.getElementById('btn-connect-google');
     const btnDisconnectGoogle = document.getElementById('btn-disconnect-google');
     const btnSyncNow = document.getElementById('btn-sync-now');
+    const btnDownloadDocs = document.getElementById('btn-download-docs');
     const statusDot = document.getElementById('status-dot');
     const statusText = document.getElementById('status-text');
     const clientIdConfigDrawer = document.getElementById('client-id-config-drawer');
@@ -935,6 +936,117 @@ document.addEventListener('DOMContentLoaded', async () => {
         showToast("OAuth Settings saved!");
         appendTerminalLine(`[SYSTEM] Client ID configured: ${idVal.substring(0, 20)}...`, "system");
     });
+
+    // FEATURE: Layman Codebase & User Guide Downloader
+    // WHAT IT DOES IN APP: Triggers a direct native download of a comprehensive, 
+    // plain English text document describing every function, local database operation, 
+    // and Google Calendar sync fix inside your app. Saves directly to your phone's Downloads folder!
+    if (btnDownloadDocs) {
+        btnDownloadDocs.addEventListener('click', () => {
+            const handbookText = `========================================================================
+COACH TUSHAR CRM APP - DEVELOPER & USER HANDBOOK (VERSION 1.0.0)
+========================================================================
+
+This is your official codebase guide written in very simple, normal-person
+English. Even a complete beginner or non-technical person can easily understand 
+how this app works!
+
+------------------------------------------------------------------------
+SECTION 1: THE CORE APP SYSTEM (HOW THE PIECES FIT)
+------------------------------------------------------------------------
+Your app works like a two-room house:
+1. The Phone Shell (MainActivity.kt): This is the native Android app 
+   wrapper. It runs on the phone, controls the screen, and manages 
+   downloads.
+2. The Web Screen (index.html, app.js, style.css): This is the actual
+   visual interface (buttons, text, colors) that you see inside the app.
+
+When you click buttons or add tasks:
+- app.js manages the visual action.
+- db.js saves the data directly onto your phone's memory (IndexedDB).
+- MainActivity.kt handles phone-specific actions, like bypassing Google 
+   security blocks and downloading documents.
+
+------------------------------------------------------------------------
+SECTION 2: GOOGLE CALENDAR LIVE SYNC (HOW IT WORKS)
+------------------------------------------------------------------------
+Feature A: Connection & Security Bypass (net::ERR_CONNECTION_REFUSED Fix)
+- Problem: For security, Android WebViews block public websites (like Google)
+  from sending you back to local virtual sites ("localhost") after logging in.
+  This causes a "Webpage not available" error.
+- Fix in MainActivity.kt: The app intercepts this redirect. Instead of letting 
+  the browser's network card load it, the app manually and programmatically 
+  loads the URL in the background. This completely bypasses the connection refusal 
+  so you log in successfully!
+
+Feature B: Google Session Validity Checker (Expired Session Fix)
+- What it does: Google login tokens automatically expire after exactly 1 hour. 
+  On startup, the app checks if your token is still valid. If it is, sync stays active.
+  If it has expired, the app logs you out, turns the sync dot gray/red, and safely
+  returns to "Simulator Mode" so you are never misled.
+
+Feature C: Automatic Offline-to-Online Sync
+- What it does: If you schedule tasks while offline or logged out (Simulator Mode), 
+  they only exist on your phone. As soon as you log in and connect your Google 
+  Calendar, this background engine automatically finds all unsynced tasks and uploads 
+  them to your Google Calendar in a single batch!
+
+Feature D: Manual "Sync Now" Button
+- What it does: Adds a green "Sync Now" button to the Settings panel so you can 
+  manually trigger database-wide calendar sync instantly whenever you want.
+
+------------------------------------------------------------------------
+SECTION 3: PHONE MEMORY DATABASE (db.js)
+------------------------------------------------------------------------
+Your app stores everything locally on your phone using a browser database 
+called IndexedDB. Here are the core actions in normal person language:
+1. "getAllTasks()": Gets all your saved tasks (like workouts) from your phone's 
+   memory to show them on the screen.
+2. "saveTask(task)": Saves a brand new task or updates an old task (like marking 
+   it finished) inside your phone's memory.
+3. "deleteTask(id)": Permanently deletes a task from your phone's memory when 
+   you click delete.
+4. "getAllClients()": Gets the list of all your clients from your phone's memory 
+   to show them in the CRM directory.
+5. "getClient(id)": Fetches one specific client's profile details (like weight 
+   or name) using their special ID.
+6. "saveClient(client)": Saves a new client's profile or updates an existing 
+   client's info (like weight or photo) in your phone's memory.
+7. "deleteClient(id)": Deletes a client and all of their weekly progress logs 
+   completely from your phone's memory.
+
+------------------------------------------------------------------------
+SECTION 4: TROUBLESHOOTING & COMMON ERRORS
+------------------------------------------------------------------------
+- "My task isn't showing on Google Calendar!":
+  Check the indicator dot in Settings. If it is gray/red ("Simulator Mode"), 
+  your session has expired. Click "Connect" to log in again. Once connected, 
+  all your unsynced tasks will automatically upload immediately!
+- "Horizontal Table Swipe":
+  You can swipe the client directory tables horizontally with a smooth touch. 
+  The rest of the screen stays locked vertically so the page never slides around.
+`;
+
+            try {
+                // Safely convert the guide text to a Base64 binary string
+                const base64Data = btoa(unescape(encodeURIComponent(handbookText)));
+                // Trigger the Android download bridge to save the file
+                if (window.AndroidBridge && window.AndroidBridge.downloadFile) {
+                    window.AndroidBridge.downloadFile(base64Data, "Coach_Tushar_CRM_Handbook.txt", "text/plain");
+                } else {
+                    // Fallback download trigger if running inside a desktop browser for testing
+                    const link = document.createElement('a');
+                    link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(handbookText);
+                    link.download = 'Coach_Tushar_CRM_Handbook.txt';
+                    link.click();
+                    showToast("Downloaded Handbook to browser!");
+                }
+            } catch (err) {
+                console.error("Download error:", err);
+                showToast("Failed to download handbook.", "error");
+            }
+        });
+    }
 
     // Help Guides modals
     btnSetupHelp.addEventListener('click', (e) => {
