@@ -114,14 +114,18 @@ class MainActivity : ComponentActivity() {
                 ): Boolean {
                     val url = request.url.toString()
 
-                    // If navigating back to localhost (e.g. from Google OAuth), intercept and load it programmatically
-                    // to bypass Android WebView's cross-origin Private Network Access blocks.
+                    // FEATURE: Google OAuth Redirect Refusal Bypass
+                    // WHAT IT DOES IN APP: When you log in with Google, Google redirects back to "https://localhost/...".
+                    // Ordinarily, the Android WebView blocks public websites from communicating with "localhost" for safety 
+                    // reasons, causing a "Webpage not available (ERR_CONNECTION_REFUSED)" error.
+                    // By intercepting this redirect and manually loading the address programmatically via code, 
+                    // we bypass this connection refusal, allowing you to log in successfully and sync your Google Calendar.
                     if (url.startsWith("http://localhost/") || url.startsWith("https://localhost/")) {
                         if (url.contains("access_token=") || url.contains("error=")) {
-                            view.loadUrl(url)
-                            return true
+                            view.loadUrl(url) // Safely and programmatically load the login response in the app container
+                            return true // Tell the Android operating system we have successfully intercepted this request
                         }
-                        return false
+                        return false // Let the WebView load ordinary virtual localhost pages normally
                     }
 
                     // Keep Google OAuth login consent flow windows inside our app WebView.

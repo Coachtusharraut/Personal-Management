@@ -807,24 +807,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateSyncStatusDisplay();
     }
 
+    // FEATURE: Google Session Validity Checker
+    // WHAT IT DOES IN APP: On startup, the app loads your saved Google connection token. 
+    // This function checks if that token is still valid. If it is valid, your calendar remains in "Live Sync" mode.
+    // If it has expired (which happens every 1 hour for safety), the app automatically logs you out, 
+    // reverts to safe "Simulator Mode", and turns the indicator dot gray/red so you know to connect again.
     async function fetchGoogleUserProfile(token) {
         try {
+            // Send request to Google's profile server with our token
             const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
+                // If token is green-lit, extract profile details
                 const profile = await response.json();
-                localStorage.setItem('google_user_name', profile.name);
-                isLiveSyncMode = true;
-                updateSyncStatusDisplay(profile.name);
+                localStorage.setItem('google_user_name', profile.name); // Save user name locally
+                isLiveSyncMode = true; // Turn on live sync engine
+                updateSyncStatusDisplay(profile.name); // Show your profile name in settings
                 appendTerminalLine(`[SUCCESS] Connected to Google. Authenticated as: ${profile.name}`, "success");
-                syncUnsyncedTasksToGoogleCalendar();
+                syncUnsyncedTasksToGoogleCalendar(); // Automatically upload any offline tasks you created
             } else {
                 if (response.status === 401) {
+                    // Status 401 means "Unauthorized" (expired session). Cleanly log out.
                     handleLogoutGoogle();
                     appendTerminalLine(`[ERROR] Google Session Expired on startup. Logged out.`, "error");
                 } else {
-                    // BULLETPROOF: Falling back gracefully to 'Google Account' without logging out, in case profile scope wasn't selected
+                    // Fallback to active sync mode in case profile fetch fails for other reasons (e.g. scope missing)
                     isLiveSyncMode = true;
                     updateSyncStatusDisplay("Google Account");
                     appendTerminalLine(`[INFO] Google Profile fetch returned status ${response.status}. Session active in Google Account mode.`, "info");
@@ -1138,6 +1146,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // FEATURE: Offline Task Auto-Sync Engine
+    // WHAT IT DOES IN APP: When you are offline or your session is expired, you can still schedule tasks.
+    // However, those tasks only exist on your phone (they have placeholder "mock-event-" IDs).
+    // As soon as you log in and connect your Google account, this function scans your local database,
+    // finds all tasks that haven't been pushed to Google yet, and uploads them automatically!
     async function syncUnsyncedTasksToGoogleCalendar() {
         if (!isLiveSyncMode || !googleAccessToken) {
             appendTerminalLine("[SYNC] Auto-sync skipped: Sync engine is in Simulator Mode.", "info");
@@ -1146,19 +1159,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         appendTerminalLine("[SYNC] Scanning for unsynced local tasks...", "system");
         try {
+            // Load all tasks stored on the phone's memory database (IndexedDB)
             const tasks = await window.dbInstance.getAllTasks();
             let syncCount = 0;
             for (const task of tasks) {
+                // Check if the task has NO Google ID, or has a simulated mock ID
                 if (!task.googleEventId || task.googleEventId.startsWith('mock-event-')) {
                     appendTerminalLine(`[SYNC] Syncing local task '${task.title}' to Google Calendar...`, "info");
+                    // Call the API creator to post the task as a live Google Calendar event
                     await handleAutoCreateGoogleEvent(task);
-                    syncCount++;
+                    syncCount++; // Increment the counter of successfully synced events
                 }
             }
             if (syncCount > 0) {
                 appendTerminalLine(`[SUCCESS] Automatically synced ${syncCount} local tasks to Google Calendar!`, "success");
-                loadAllTasks();
-                renderCalendar();
+                loadAllTasks(); // Refresh the visible task cards list
+                renderCalendar(); // Refresh the calendar grid view to show the new event dots
             } else {
                 appendTerminalLine("[SYNC] All local tasks are already in sync with Google Calendar.", "success");
             }
