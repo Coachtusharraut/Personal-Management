@@ -82,96 +82,96 @@ class LocalDB {
         return { transaction, store };
     }
 
-    // --- TASKS API FUNCTIONS ---
+    // --- TASKS API FUNCTIONS (THESE MANAGE YOUR TO-DO LISTS) ---
     
-    // Retrieve all saved checklist tasks from the database.
+    // Gets all your saved tasks (like workouts or schedules) from your phone's memory to show them on the screen.
     getAllTasks() {
-        // Return a Promise so the application can wait until the retrieval is complete.
+        // Prepare a promise to wait until your phone fetches the tasks
         return new Promise((resolve, reject) => {
-            // Open a read-only transaction on the 'tasks' table.
+            // Open the tasks list in read-only mode (we are only reading, not editing)
             const { store } = this._getTransaction('tasks', 'readonly');
-            // Execute the query to get all records inside the table.
+            // Ask the phone memory to give us all task records
             const request = store.getAll();
-            // On success, resolve the Promise and return the array of tasks (or empty array if none).
+            // If successful, send the list of tasks back to the screen
             request.onsuccess = () => resolve(request.result || []);
-            // On error, reject the Promise and return the failure reason.
+            // If it fails, report the error
             request.onerror = () => reject(request.error);
         });
     }
 
-    // Save or update a checklist task inside the database.
+    // Saves a brand new task or updates an old task (like marking it finished) inside your phone's memory.
     saveTask(task) {
-        // Return a Promise so other scripts can wait for the write operation to finish.
+        // Prepare a promise to wait until the task is successfully saved
         return new Promise((resolve, reject) => {
-            // Open an write-enabled transaction on the 'tasks' table.
+            // Open the tasks list in edit mode (since we are writing/saving new data)
             const { store } = this._getTransaction('tasks', 'readwrite');
-            // Store or overwrite the task record inside the table.
+            // Put the task inside the phone's local memory
             const request = store.put(task);
-            // On success, resolve the Promise and return the saved task's unique ID.
+            // If successful, return the ID of the saved task
             request.onsuccess = () => resolve(task.id);
-            // On error, reject the Promise with the failure details.
+            // If it fails, report the error
             request.onerror = () => reject(request.error);
         });
     }
 
-    // Delete a checklist task permanently from the database.
+    // Permanently deletes a task from your phone's memory when you click delete.
     deleteTask(id) {
-        // Return a Promise so other scripts can wait for the deletion to complete.
+        // Prepare a promise to wait until the task is deleted
         return new Promise((resolve, reject) => {
-            // Open an write-enabled transaction on the 'tasks' table.
+            // Open the tasks list in edit mode (since we are removing data)
             const { store } = this._getTransaction('tasks', 'readwrite');
-            // Delete the specific task record matching the unique ID.
+            // Delete the specific task using its unique ID
             const request = store.delete(id);
-            // On success, resolve the Promise and return true.
+            // If successful, return true (success confirmation)
             request.onsuccess = () => resolve(true);
-            // On error, reject the Promise with the failure reason.
+            // If it fails, report the error
             request.onerror = () => reject(request.error);
         });
     }
 
-    // --- CLIENTS API FUNCTIONS ---
+    // --- CLIENTS API FUNCTIONS (THESE MANAGE YOUR TRAINEE PROFILES) ---
     
-    // Retrieve the entire database directory list of clients.
+    // Gets the list of all your clients from your phone's memory to show them in the CRM directory.
     getAllClients() {
-        // Return a Promise so the application can wait for the retrieval.
+        // Prepare a promise to wait until all client profiles are fetched
         return new Promise((resolve, reject) => {
-            // Open a read-only transaction on the 'clients' table.
+            // Open the clients list in read-only mode
             const { store } = this._getTransaction('clients', 'readonly');
-            // Execute the query to get all records in the table.
+            // Ask the phone memory for all client profiles
             const request = store.getAll();
-            // On success, resolve the Promise and return the list of clients (or empty array).
+            // If successful, send the list of clients back to the directory list
             request.onsuccess = () => resolve(request.result || []);
-            // On error, reject the Promise with the failure reason.
+            // If it fails, report the error
             request.onerror = () => reject(request.error);
         });
     }
 
-    // Fetch a single client's profile details matching their unique ID.
+    // Fetches one specific client's profile details (like weight, diet, or name) using their special ID.
     getClient(id) {
-        // Return a Promise so other scripts can wait for the result.
+        // Prepare a promise to wait until the specific client is loaded
         return new Promise((resolve, reject) => {
-            // Open a read-only transaction on the 'clients' table.
+            // Open the clients list in read-only mode
             const { store } = this._getTransaction('clients', 'readonly');
-            // Get the specific client profile record matching the ID.
+            // Fetch the profile matching the exact ID
             const request = store.get(id);
-            // On success, resolve the Promise and return the client object (or null if not found).
+            // If successful, return the client details (or return nothing if not found)
             request.onsuccess = () => resolve(request.result || null);
-            // On error, reject the Promise.
+            // If it fails, report the error
             request.onerror = () => reject(request.error);
         });
     }
 
-    // Save or update a client's profile information in the database.
+    // Saves a new client's profile or updates an existing client's info (like weight or photo) in your phone's memory.
     saveClient(client) {
-        // Return a Promise so other scripts can wait for the write to finish.
+        // Prepare a promise to wait until the client profile is saved
         return new Promise((resolve, reject) => {
-            // Open a write-enabled transaction on the 'clients' table.
+            // Open the clients list in edit mode
             const { store } = this._getTransaction('clients', 'readwrite');
-            // Put the client profile record inside the table.
+            // Save the client profile details inside the local memory
             const request = store.put(client);
-            // On success, resolve the Promise and return the client's ID.
+            // If successful, return the ID of the saved client
             request.onsuccess = () => resolve(client.id);
-            // On error, reject the Promise.
+            // If it fails, report the error
             request.onerror = () => reject(request.error);
         });
     }
