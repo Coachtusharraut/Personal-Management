@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "personal-mgmt-app"
-  }
+  },
+  "targets": {
+    "personal-mgmt-app": {
+      "hosting": {
+        "tusharraut": [
+          "tusharraut"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

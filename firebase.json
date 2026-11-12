@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "site": "tusharraut",
+      "target": "tusharraut",
       "public": "dist",
       "ignore": [
         "firebase.json",
