@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import {playEagleSound} from '../utils/eagleEffects';
 import { ArrowRight, Plus, Users, MessageCircle, CalendarCheck, TrendingUp, Target, Sparkles } from 'lucide-react';
 
 const EAGLE_ART=(
@@ -34,7 +35,7 @@ export default function DashboardView({teams=[],ibos=[],prospects=[],activities=
 
  return <div className="eagle-home space-y-4">
   <section className="eagle-hero">
-   <div className="eagle-hero-top"><div><p className="eagle-kicker">{greeting}, Eagle Builder 🪶</p><h1>Let's build<br/><span>your Eagle.</span></h1><p className="eagle-sub">One conversation at a time.</p></div><div className="eagle-art">{EAGLE_ART}</div></div>
+   <div className="eagle-hero-top"><div><p className="eagle-kicker">{greeting}, Eagle Builder 🪶</p><h1>Let's build<br/><span>your Eagle.</span></h1><p className="eagle-sub">One conversation at a time.</p></div><div className="eagle-art relative"><button type="button" onClick={()=>playEagleSound('eagle')} title="Hear the eagle" aria-label="Play eagle call" className="absolute right-0 top-0 z-10 rounded-full border border-amber-200/30 bg-black/25 px-2 py-1 text-[10px] text-amber-100">🔊</button>{EAGLE_ART}</div></div>
    <div className="eagle-mission-strip"><span>🎯</span><div><b>THE EAGLE STRUCTURE</b><small>6 teams · 10 Core IBOs each · 3%+ per leg</small></div><button onClick={()=>onNavigate('progress')} aria-label="View structure"><ArrowRight size={19}/></button></div>
   </section>
 
