@@ -31,12 +31,35 @@ const PROMPTS=[
  'Describe a moment when discipline mattered more than motivation.'
 ];
 
-export default function StoryForgeView({missionState,stories=[],onAddQuest}){
+export default function StoryForgeView({missionState,stories=[],tasks=[],habits=[],opportunities=[],onAddQuest}){
  const {user}=useAuth();
  const xp=missionState?.userLevel?.currentXp||0;
  const [mode,setMode]=useState('journey');
  const [draft,setDraft]=useState({title:'',scene:'',conflict:'',turningPoint:'',lesson:'',audience:'',type:'story'});
  const [saving,setSaving]=useState(false);
+ const characterStats=useMemo(()=>{
+  const quests=missionState?.dailyQuests||[];
+  const completed=quests.filter(q=>q.completed);
+  const taskDone=tasks.filter(t=>t.status==='done'||t.completed);
+  const habitPoints=habits.reduce((n,h)=>n+Object.values(h.history||{}).filter(Boolean).length,0);
+  const stat=(terms)=>{
+   const match=(value)=>terms.some(term=>String(value||'').toLowerCase().includes(term));
+   const questXp=completed.filter(q=>match(q.category)).reduce((n,q)=>n+(Number(q.xp)||0),0);
+   const taskXp=taskDone.filter(t=>match(t.category)).length*25;
+   const habitXp=habits.filter(h=>match(h.category)).reduce((n,h)=>n+Object.values(h.history||{}).filter(Boolean).length*10,0);
+   return Math.min(100,Math.round((questXp+taskXp+habitXp)/10));
+  };
+  const completedAll=completed.reduce((n,q)=>n+(Number(q.xp)||0),0)+taskDone.length*25+habitPoints*10;
+  return [
+   {name:'Strength',score:stat(['health','fitness','strength','movement']),note:'Training and physical practice'},
+   {name:'Discipline',score:Math.min(100,Math.round(completedAll/10)),note:'Promises kept through action'},
+   {name:'Courage',score:stat(['personal growth','speaking','opportunities','brave']),note:'Actions taken despite discomfort'},
+   {name:'Wisdom',score:stat(['learning','research','mastery','reading']),note:'Learning applied in practice'},
+   {name:'Communication',score:stat(['speaking','communication','storytelling','content']),note:'Speaking, writing and storytelling'},
+   {name:'Vitality',score:stat(['health','fitness','sleep','yoga','recovery']),note:'Health and recovery habits'},
+   {name:'Impact',score:stat(['business','mission','obesity','client','impact']),note:'Value delivered to other people'}
+  ];
+ },[missionState,tasks,habits]);
  const unlocked=CHAPTERS.filter(c=>xp>=c.threshold);
  const next=CHAPTERS.find(c=>xp<c.threshold);
  const completedQuests=(missionState?.dailyQuests||[]).filter(q=>q.completed).length;
@@ -67,6 +90,12 @@ export default function StoryForgeView({missionState,stories=[],onAddQuest}){
   </section>
   <div className="flex flex-wrap gap-2">{[{id:'journey',label:'Hero’s Journey',icon:BookOpen},{id:'shadows',label:'Shadow Battles',icon:Shield},{id:'write',label:'Story & Speech Forge',icon:Mic2},{id:'vault',label:'My Story Vault',icon:ScrollText}].map(x=>{const I=x.icon;return <button key={x.id} onClick={()=>setMode(x.id)} className={'inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold '+(mode===x.id?'bg-amber-300 text-[#091a35] border-amber-300':'bg-slate-900 text-slate-400 border-slate-700') }><I size={14}/>{x.label}</button>})}</div>
 
+  <section className="rounded-2xl border border-amber-300/15 bg-[#101b2c] p-5">
+   <div className="flex flex-wrap items-end justify-between gap-2"><div><p className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Character sheet</p><h2 className="mt-1 text-lg font-extrabold text-white">Strength grows through evidence</h2></div><p className="text-[10px] text-slate-500">Derived from completed quests, tasks and habit history</p></div>
+   <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">{characterStats.map(stat=><div key={stat.name} className="rounded-xl border border-slate-800 bg-slate-950/50 p-3"><div className="flex items-center justify-between gap-2"><span className="text-xs font-bold text-slate-200">{stat.name}</span><span className="text-xs font-black text-amber-200">{stat.score}/100</span></div><div className="mt-2 h-1.5 rounded-full bg-slate-800"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-300" style={{width:stat.score+'%'}}/></div><p className="mt-2 text-[10px] text-slate-500">{stat.note}</p></div>)}</div>
+   <p className="mt-3 text-[10px] leading-relaxed text-slate-500">These are game-style indicators, not scientific assessments of your fitness, personality or worth. They start at zero and rise only from recorded activity.</p>
+  </section>
+
   {mode==='journey'&&<section className="space-y-4">
    <div><h2 className="text-xl font-extrabold text-white">Campaign map</h2><p className="text-xs text-slate-400 mt-1">Chapters unlock through XP earned from actual quests and habits. No progress is pre-awarded.</p></div>
    <div className="relative space-y-3">{CHAPTERS.map((c,i)=>{const open=xp>=c.threshold;return <article key={c.title} className={'relative rounded-2xl border p-5 '+(open?'border-amber-300/25 bg-gradient-to-r from-[#17263b] to-[#101829]':'border-slate-800 bg-slate-900/50 opacity-70')}><div className="flex items-start gap-4"><div className={'grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-xl '+(open?'bg-amber-300 text-[#091a35]':'bg-slate-800 text-slate-500')}>{open?['🏹','🛞','🔥','🌉','👑'][i]:'🔒'}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] uppercase tracking-wider text-amber-300 font-bold">{c.world}</span><span className="text-[10px] text-slate-500">· {c.threshold.toLocaleString('en-IN')} XP to unlock</span></div><h3 className="mt-1 text-base font-extrabold text-white">{i+1}. {c.title}</h3><p className="mt-2 text-xs text-slate-300 leading-relaxed">{open?c.scene:'This chapter opens after you earn more experience through real-world action.'}</p>{open&&<div className="mt-3 rounded-xl bg-emerald-400/5 border border-emerald-400/15 p-3"><p className="text-[10px] uppercase font-bold text-emerald-300">Wisdom to carry</p><p className="mt-1 text-xs text-slate-200">{c.lesson}</p></div>}</div><span className={'text-[10px] font-bold rounded-full px-2 py-1 '+(open?'bg-emerald-400/10 text-emerald-300':'bg-slate-800 text-slate-500')}>{open?'Unlocked':'Locked'}</span></div></article>})}</div>
@@ -75,7 +104,7 @@ export default function StoryForgeView({missionState,stories=[],onAddQuest}){
 
   {mode==='shadows'&&<section className="space-y-4">
    <div className="rounded-2xl border border-rose-300/15 bg-rose-300/5 p-4"><p className="text-sm font-bold text-rose-200">The enemy is the pattern—not the person.</p><p className="mt-1 text-xs leading-relaxed text-slate-300">JP Sir, Grandpa and Sourabh are included only as remembered voices from your story. LifeOS cannot know their present beliefs or compare your progress with theirs. Every battle is about your own courage, consistency and self-respect—not revenge.</p></div>
-   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">{SHADOWS.map(sh=> <article key={sh.id} className="rounded-2xl border border-slate-800 bg-[#0d192b] p-4"><div className="flex items-center justify-between"><span className="text-2xl">{sh.icon}</span><span className="text-[9px] uppercase tracking-wider text-slate-500">Boss encounter</span></div><h3 className="mt-3 text-sm font-extrabold text-white">{sh.name}</h3><p className="mt-1 text-xs text-slate-400">{sh.desc}</p><div className="mt-3 rounded-xl bg-slate-950/70 p-3"><p className="text-[10px] uppercase font-bold text-amber-300">Victory condition</p><p className="mt-1 text-xs text-slate-200">{sh.action}</p></div><button onClick={()=>challenge(sh)} className="mt-3 w-full rounded-xl bg-amber-300 py-2.5 text-xs font-black text-[#091a35] flex items-center justify-center gap-2"><Sword size={14}/> Accept challenge · +100 XP</button></article>)}</div>
+   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">{SHADOWS.map(sh=> <article key={sh.id} className="rounded-2xl border border-slate-800 bg-[#0d192b] p-4"><div className="flex items-center justify-between"><span className="text-2xl">{sh.icon}</span><span className="text-[9px] uppercase tracking-wider text-slate-500">Boss encounter</span></div><h3 className="mt-3 text-sm font-extrabold text-white">{sh.name}</h3><p className="mt-1 text-xs text-slate-400">{sh.desc}</p><div className="mt-3 rounded-xl bg-slate-950/70 p-3"><p className="text-[10px] uppercase font-bold text-amber-300">Victory condition</p><p className="mt-1 text-xs text-slate-200">{sh.action}</p></div><button onClick={()=>challenge(sh)} className="mt-3 w-full rounded-xl bg-amber-300 py-2.5 text-xs font-black text-[#091a35] flex items-center justify-center gap-2"><Sword size={14}/> Accept challenge · 100 XP reward</button></article>)}</div>
   </section>}
 
   {mode==='write'&&<section className="grid grid-cols-1 lg:grid-cols-[.8fr_1.2fr] gap-4">
