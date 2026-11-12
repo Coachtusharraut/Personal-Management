@@ -30,8 +30,8 @@ export default function PeoplePipelineView({prospects=[],teams=[],onAddActivity}
   await onAddActivity?.({type:'conversation',quantity:1,note:'Follow-up conversation with '+p.name,prospectId:p.id,teamId:p.teamId||''});
  };
  const convert=async(p)=>{
-  const teamId=p.teamId||teams[0]?.id;
-  if(!teamId){alert('Create your teams first.');return;}
+  const teamId=p.teamId;
+  if(!teamId){alert('Choose which of your six teams this person will join first.');return;}
   if(!confirm('Add '+p.name+' as an IBO in '+(teams.find(t=>t.id===teamId)?.name||'the selected team')+'?'))return;
   await addItem(user.uid,'ibos',{name:p.name,phone:p.phone||'',teamId,prospectId:p.id,meetingAttended:false,bookingMade:false,businessActive:false,createdAt:new Date().toISOString()});
   await updateItem(user.uid,'prospects',p.id,{stage:'converted',teamId,convertedAt:new Date().toISOString()});
@@ -46,7 +46,7 @@ export default function PeoplePipelineView({prospects=[],teams=[],onAddActivity}
    <div className="space-y-2">{visible.map(p=><article key={p.id} className="eagle-person-card"><div className="flex items-start gap-3"><div className="eagle-ibo-avatar">{p.name?.[0]?.toUpperCase()||'P'}</div><div className="min-w-0 flex-1"><b className="block truncate">{p.name}</b><small className="text-[10px] text-slate-400">{p.source||p.phone||'New contact'} · {p.conversations||1} conversations</small></div><span className="eagle-stage">{STAGES.find(x=>x[0]===p.stage)?.[1]||'Conversation'}</span></div>
     {p.notes&&<p className="mt-2 text-[11px] text-slate-400">{p.notes}</p>}
     <div className="mt-3 grid grid-cols-2 gap-2"><button onClick={()=>logTalk(p)} className="eagle-secondary-button"><MessageCircle size={14}/> Log talk</button><select value={p.stage||'conversation'} onChange={e=>updateStage(p,e.target.value)} className="eagle-select">{STAGES.map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></div>
-    {p.stage!=='converted'&&p.stage!=='parked'&&<button onClick={()=>convert(p)} className="mt-2 w-full rounded-xl bg-amber-300/10 py-2.5 text-xs font-extrabold text-amber-200"><Users size={14} className="inline mr-1"/> Add as IBO to a team</button>}
+    {p.stage!=='converted'&&p.stage!=='parked'&&<><select value={p.teamId||''} onChange={e=>updateItem(user.uid,'prospects',p.id,{teamId:e.target.value})} className="eagle-input mt-2"><option value="">Choose a team for this person…</option>{teams.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select><button onClick={()=>convert(p)} disabled={!p.teamId} className="mt-2 w-full rounded-xl bg-amber-300/10 py-2.5 text-xs font-extrabold text-amber-200 disabled:opacity-40"><Users size={14} className="inline mr-1"/> Add as IBO to {teams.find(t=>t.id===p.teamId)?.name||'team'}</button></>}
     <div className="mt-2 text-right"><button onClick={()=>{if(confirm('Remove this contact?'))deleteItem(user.uid,'prospects',p.id)}} className="text-[10px] text-slate-600 hover:text-rose-300"><Trash2 size={12} className="inline mr-1"/>Remove</button></div>
    </article>)}</div>}
  </div>;
