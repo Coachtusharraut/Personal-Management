@@ -33,7 +33,7 @@ const PROMPTS=[
 
 export default function StoryForgeView({missionState,stories=[],tasks=[],habits=[],opportunities=[],onAddQuest}){
  const {user}=useAuth();
- const xp=missionState?.userLevel?.currentXp||0;
+ const xp=missionState?.userLevel?.totalXp ?? missionState?.userLevel?.currentXp ?? 0;
  const [mode,setMode]=useState('journey');
  const [draft,setDraft]=useState({title:'',scene:'',conflict:'',turningPoint:'',lesson:'',audience:'',type:'story'});
  const [saving,setSaving]=useState(false);
