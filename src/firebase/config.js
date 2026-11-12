@@ -21,15 +21,15 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const db = getFirestore(app);
 
-// Enable offline persistence if in browser environment
+// Safely attempt offline persistence if supported in browser
 if (typeof window !== 'undefined') {
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Firestore persistence failed: multiple tabs open');
-    } else if (err.code === 'unimplemented') {
-      console.warn('Firestore persistence not supported in this browser');
-    }
-  });
+  try {
+    enableIndexedDbPersistence(db).catch(() => {
+      // Ignore multiple tab or unsupported browser warning
+    });
+  } catch (e) {
+    // Graceful fallback
+  }
 }
 
 export default app;

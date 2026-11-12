@@ -4,6 +4,7 @@ import { subscribeCollection } from './firebase/firestoreService';
 import Navbar from './components/Navbar';
 import Sidebar, { NAV_ITEMS } from './components/Sidebar';
 import QuickAddModal from './components/QuickAddModal';
+import { Timer } from 'lucide-react';
 
 import DashboardView from './modules/DashboardView';
 import TasksView from './modules/TasksView';

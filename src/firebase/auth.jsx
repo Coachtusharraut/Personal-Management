@@ -15,46 +15,62 @@ export const useAuth = () => useContext(AuthContext);
 
 const GUEST_STORAGE_KEY = 'tusharraut_guest_session';
 
+const DEFAULT_GUEST = {
+  uid: 'tushar_demo_user',
+  displayName: 'Tushar Raut',
+  email: 'tusharraut2001@gmail.com',
+  photoURL: null,
+  isAnonymous: true,
+};
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isGuest, setIsGuest] = useState(false);
+  const [user, setUser] = useState(() => {
+    try {
+      const storedGuest = typeof window !== 'undefined' ? localStorage.getItem(GUEST_STORAGE_KEY) : null;
+      return storedGuest ? JSON.parse(storedGuest) : DEFAULT_GUEST;
+    } catch {
+      return DEFAULT_GUEST;
+    }
+  });
+  const [loading, setLoading] = useState(false);
+  const [isGuest, setIsGuest] = useState(true);
 
   useEffect(() => {
-    // Check if user was previously in guest mode
-    const storedGuest = localStorage.getItem(GUEST_STORAGE_KEY);
-    
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        setIsGuest(false);
-        localStorage.removeItem(GUEST_STORAGE_KEY);
-      } else if (storedGuest) {
-        try {
-          const guestUser = JSON.parse(storedGuest);
-          setUser(guestUser);
-          setIsGuest(true);
-        } catch {
-          setUser(null);
-          setIsGuest(false);
+    try {
+      const unsubscribe = onAuthStateChanged(
+        auth,
+        (firebaseUser) => {
+          if (firebaseUser) {
+            setUser(firebaseUser);
+            setIsGuest(false);
+            localStorage.removeItem(GUEST_STORAGE_KEY);
+          } else {
+            try {
+              const storedGuest = localStorage.getItem(GUEST_STORAGE_KEY);
+              if (storedGuest) {
+                setUser(JSON.parse(storedGuest));
+              } else {
+                setUser(DEFAULT_GUEST);
+                localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(DEFAULT_GUEST));
+              }
+            } catch {
+              setUser(DEFAULT_GUEST);
+            }
+            setIsGuest(true);
+          }
+          setLoading(false);
+        },
+        (error) => {
+          console.warn('Firebase Auth state listener note:', error);
+          setLoading(false);
         }
-      } else {
-        // Default to a friendly local guest profile for instant out-of-the-box readiness
-        const defaultGuest = {
-          uid: 'tushar_demo_user',
-          displayName: 'Tushar Raut',
-          email: 'tusharraut2001@gmail.com',
-          photoURL: null,
-          isAnonymous: true,
-        };
-        setUser(defaultGuest);
-        setIsGuest(true);
-        localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(defaultGuest));
-      }
-      setLoading(false);
-    });
+      );
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn('Firebase Auth initialization caught:', err);
+      setLoading(false);
+    }
   }, []);
 
   const loginWithGoogle = async () => {
@@ -133,7 +149,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

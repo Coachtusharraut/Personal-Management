@@ -150,8 +150,8 @@ export default function SettingsView() {
             <p className="font-mono text-white font-semibold mt-0.5">Cloud Firestore (Multi-region)</p>
           </div>
           <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-850">
-            <span className="text-slate-400 text-[11px]">Hosting Domain</span>
-            <p className="font-mono text-indigo-400 font-semibold mt-0.5">personal-mgmt-app.web.app</p>
+            <span className="text-slate-400 text-[11px]">Primary Hosting Domain</span>
+            <p className="font-mono text-indigo-400 font-semibold mt-0.5">tusharraut.web.app</p>
           </div>
           <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-850">
             <span className="text-slate-400 text-[11px]">Offline Persistence</span>
