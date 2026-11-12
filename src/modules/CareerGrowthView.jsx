@@ -28,7 +28,7 @@ export default function CareerGrowthView({goals=[],missionState,onAddQuest,onNav
  const [actionDraft,setActionDraft]=useState({});
  const [progressDraft,setProgressDraft]=useState({});
  const [milestoneDraft,setMilestoneDraft]=useState({});
- const xp=missionState?.userLevel?.currentXp||0;
+ const xp=missionState?.userLevel?.totalXp ?? missionState?.userLevel?.currentXp ?? 0;
  const level=missionState?.userLevel?.level||1;
  const existingTitles=new Set(goals.map(g=>(g.title||'').toLowerCase()));
  const suggestions=SUGGESTIONS.filter(s=>!existingTitles.has(s.title.toLowerCase()));
