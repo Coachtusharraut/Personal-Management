@@ -153,7 +153,7 @@ export const CONNECTED_GOAL_HIERARCHY = {
     targetHorizon: '2026 – 2040'
   },
   fiveYearDirection: {
-    title: 'Transform 100,000 Lives & Build India\'s Premier Preventive Health Ecosystem',
+    title: 'Empower 10,000 Engineers to Transform Their Health',
     timeframe: '2026 – 2031',
     strategicPillars: [
       'Evidence-based lifestyle behaviour modification platform',
@@ -166,33 +166,33 @@ export const CONNECTED_GOAL_HIERARCHY = {
     year: '2026–2027',
     title: 'Lay ReshapeNation Foundation: ₹50 Lakhs Revenue & 1,000 Active Transformations',
     status: 'In Progress',
-    progress: 32
+    progress: 0
   },
   quarterlyObjective: {
     quarter: 'Q4 2026 (Oct – Dec)',
     title: 'Master Speaking-to-Coaching Funnel & Achieve ₹10 Lakhs in Quarterly Revenue',
     status: 'Active',
-    progress: 45
+    progress: 0
   },
   monthlyMilestone: {
     month: 'November 2026',
     title: 'Complete Speak to Impact ₹1 Lakh Challenge & Validate High-Ticket Health Conversion',
     status: 'In Progress',
-    progress: 25
+    progress: 0
   },
   weeklyCampaignId: 'campaign-speak-to-impact-1lakh'
 };
 
 // Life Vision Pillars
 export const LIFE_VISION_PILLARS = [
-  { id: 'mission', title: 'Mission & Contribution', priority: 'Primary', status: 'Focus: ReshapeNation & Obesity-Free India', score: 92, color: 'text-amber-400' },
-  { id: 'health', title: 'Health & Fitness', priority: 'High', status: 'Metabolic fitness, strength 4x/wk, 10k steps', score: 85, color: 'text-emerald-400' },
-  { id: 'business', title: 'Business & Career', priority: 'High', status: 'ReshapeNation scaling & high-leverage engineering', score: 80, color: 'text-blue-400' },
-  { id: 'wealth', title: 'Wealth & Finances', priority: 'Medium', status: '₹1L campaign target, financial independence', score: 74, color: 'text-yellow-400' },
-  { id: 'relationships', title: 'Family & Relationships', priority: 'Medium', status: 'Presence, active listening, quality family time', score: 88, color: 'text-rose-400' },
-  { id: 'learning', title: 'Learning & Growth', priority: 'High', status: 'Metabolic health research, AI systems, philosophy', score: 90, color: 'text-purple-400' },
-  { id: 'mindset', title: 'Personal Development', priority: 'High', status: 'Stoic resilience, evening reflections, clarity', score: 82, color: 'text-indigo-400' },
-  { id: 'happiness', title: 'Experiences & Happiness', priority: 'Medium', status: 'Travel, deep work flow, creative freedom', score: 78, color: 'text-teal-400' }
+  { id: 'mission', title: 'Mission & Contribution', priority: 'Primary', status: 'Baseline not set — review this pillar', score: 0, color: 'text-amber-400' },
+  { id: 'health', title: 'Health & Fitness', priority: 'High', status: 'Baseline not set — review this pillar', score: 0, color: 'text-emerald-400' },
+  { id: 'business', title: 'Business & Career', priority: 'High', status: 'Baseline not set — review this pillar', score: 0, color: 'text-blue-400' },
+  { id: 'wealth', title: 'Wealth & Finances', priority: 'Medium', status: 'Baseline not set — review this pillar', score: 0, color: 'text-yellow-400' },
+  { id: 'relationships', title: 'Family & Relationships', priority: 'Medium', status: 'Baseline not set — review this pillar', score: 0, color: 'text-rose-400' },
+  { id: 'learning', title: 'Learning & Growth', priority: 'High', status: 'Baseline not set — review this pillar', score: 0, color: 'text-purple-400' },
+  { id: 'mindset', title: 'Personal Development', priority: 'High', status: 'Baseline not set — review this pillar', score: 0, color: 'text-indigo-400' },
+  { id: 'happiness', title: 'Experiences & Happiness', priority: 'Medium', status: 'Baseline not set — review this pillar', score: 0, color: 'text-teal-400' }
 ];
 
 // Active Campaign: Speak to Impact — ₹1 Lakh Challenge (12 Nov 2026 – 20 Nov 2026)
@@ -206,12 +206,12 @@ export const INITIAL_CAMPAIGN = {
   hypothesis: 'People enjoy listening when I speak. Can I convert this communication strength into meaningful health conversations, qualified leads, coaching customers and ₹1 lakh in collected revenue?',
   
   financials: {
-    collected: 25000,
-    committed: 35000,
-    outstanding: 15000,
-    pipeline: 80000,
-    salesCount: 2,
-    avgRevenuePerCustomer: 15000,
+    collected: 0,
+    committed: 0,
+    outstanding: 0,
+    pipeline: 0,
+    salesCount: 0,
+    avgRevenuePerCustomer: 0,
     pricingScenarios: [
       { name: 'VIP Mentorship', price: 25000, targetCount: 4, label: '4 clients @ ₹25,000 = ₹1,00,000' },
       { name: 'Hybrid Cohort', price: 15000, targetCount: 7, label: '7 clients @ ₹15,000 = ₹1,05,000' },
@@ -220,15 +220,15 @@ export const INITIAL_CAMPAIGN = {
   },
 
   activity: {
-    conversations: 18,
-    speakingOpportunities: 3,
-    audienceReached: 140,
-    contentPublished: 4,
-    qualifiedProspects: 9,
-    consultationsBooked: 7,
-    consultationsCompleted: 5,
-    proposalsSent: 4,
-    followUpsDone: 11
+    conversations: 0,
+    speakingOpportunities: 0,
+    audienceReached: 0,
+    contentPublished: 0,
+    qualifiedProspects: 0,
+    consultationsBooked: 0,
+    consultationsCompleted: 0,
+    proposalsSent: 0,
+    followUpsDone: 0
   },
 
   learnings: {
@@ -271,7 +271,7 @@ export const INITIAL_CAMPAIGN = {
       durationMins: 45,
       xp: 120,
       approved: true,
-      completed: true,
+      completed: false,
       category: 'Business Development'
     },
     {
@@ -373,7 +373,7 @@ export const INITIAL_CAMPAIGN = {
   ]
 };
 
-// Initial Dynamic Daily Quests (12 November 2026)
+// Initial Dynamic Daily Quests — editable starter missions; no actions are pre-completed.
 export const INITIAL_DAILY_QUESTS = [
   {
     id: 'quest-top-1',
@@ -385,10 +385,10 @@ export const INITIAL_DAILY_QUESTS = [
     tier: 'top3',
     priority: 'urgent',
     durationMins: 60,
-    dueDate: '2026-11-12',
+    dueDate: new Date().toISOString().slice(0,10),
     startTime: '16:00',
     endTime: '17:00',
-    status: 'in-progress',
+    status: 'todo',
     xp: 150,
     completed: false
   },
@@ -402,12 +402,12 @@ export const INITIAL_DAILY_QUESTS = [
     tier: 'top3',
     priority: 'urgent',
     durationMins: 45,
-    dueDate: '2026-11-12',
+    dueDate: new Date().toISOString().slice(0,10),
     startTime: '11:30',
     endTime: '12:15',
-    status: 'done',
+    status: 'todo',
     xp: 140,
-    completed: true
+    completed: false
   },
   {
     id: 'quest-top-3',
@@ -419,12 +419,12 @@ export const INITIAL_DAILY_QUESTS = [
     tier: 'top3',
     priority: 'high',
     durationMins: 45,
-    dueDate: '2026-11-12',
+    dueDate: new Date().toISOString().slice(0,10),
     startTime: '07:30',
     endTime: '08:15',
-    status: 'done',
+    status: 'todo',
     xp: 120,
-    completed: true
+    completed: false
   },
   {
     id: 'quest-supp-1',
@@ -435,7 +435,7 @@ export const INITIAL_DAILY_QUESTS = [
     tier: 'supporting',
     priority: 'high',
     durationMins: 20,
-    dueDate: '2026-11-12',
+    dueDate: new Date().toISOString().slice(0,10),
     status: 'todo',
     xp: 80,
     completed: false
@@ -448,7 +448,7 @@ export const INITIAL_DAILY_QUESTS = [
     tier: 'supporting',
     priority: 'medium',
     durationMins: 30,
-    dueDate: '2026-11-12',
+    dueDate: new Date().toISOString().slice(0,10),
     status: 'todo',
     xp: 70,
     completed: false
@@ -461,7 +461,7 @@ export const INITIAL_DAILY_QUESTS = [
     tier: 'growth_challenge',
     priority: 'high',
     durationMins: 15,
-    dueDate: '2026-11-12',
+    dueDate: new Date().toISOString().slice(0,10),
     status: 'todo',
     xp: 100,
     completed: false
@@ -470,13 +470,13 @@ export const INITIAL_DAILY_QUESTS = [
 
 // Evening Reflection Template
 export const INITIAL_EVENING_REFLECTION = {
-  date: '2026-11-12',
-  accomplished: 'Kickstarted the ₹1 Lakh challenge! Published visceral fat video, secured ₹25k collected, logged 10k steps.',
-  habitsMaintained: 'Morning hydration, strength training, zero refined sugar, 20m reading.',
-  learned: 'People respond immediately when speaking is specific to their exact Indian lifestyle pain points.',
-  preventedProgress: 'Delayed scheduling afternoon follow-ups due to context switching.',
-  tomorrowPriorities: 'Conduct 3 scheduled consultations, finalize offer slides for weekend masterclass.',
-  rating: 8.5
+  date: new Date().toISOString().slice(0,10),
+  accomplished: '',
+  habitsMaintained: '',
+  learned: '',
+  preventedProgress: '',
+  tomorrowPriorities: '',
+  rating: 0
 };
 
 // =========================================================================
@@ -498,10 +498,10 @@ export const DAILY_REMINDERS = [
       whyWatch: 'Lock in morning circadian rhythms and prime alertness for the ₹1L Challenge.'
     },
     checklist: [
-      { text: 'Drink 500ml cold water + electrolytes', done: true },
-      { text: 'Review The Core Three quests of today', done: true },
+      { text: 'Drink 500ml cold water + electrolytes', done: false },
+      { text: 'Review The Core Three quests of today', done: false },
       { text: '10 min mobility or brisk walk outside in sunlight', done: false },
-      { text: 'Play morning mindset video & set state', done: true }
+      { text: 'Play morning mindset video & set state', done: false }
     ]
   },
   {
@@ -855,7 +855,7 @@ export const WEEKLY_BOSS = {
   name: 'The Visceral Leviathan',
   title: 'Titan of Metabolic Sluggishness & Procrastination',
   totalHp: 100000,
-  currentHp: 75000, // Reduced as revenue collected increases!
+  currentHp: 100000, // Starts at full health; real progress reduces it.
   damageSources: [
     { type: 'Revenue Collected', factor: '1 Rupee = 1 HP Damage' },
     { type: 'Consultation Completed', factor: '2,500 HP Critical Strike' },
@@ -898,11 +898,11 @@ export function subscribeMissionData(userId, callback) {
       storyWorlds: STORY_WORLDS,
       weeklyBoss: WEEKLY_BOSS,
       userLevel: {
-        level: 4,
-        title: 'Mission Vanguard',
-        currentXp: 3450,
-        nextLevelXp: 5000,
-        streakDays: 14
+        level: 1,
+        title: 'Novice Warrior',
+        currentXp: 0,
+        nextLevelXp: 500,
+        streakDays: 0
       }
     };
   };
