@@ -1,28 +1,11 @@
-const CACHE='lifeos-shell-v1';
-const SHELL=['/','/index.html','/manifest.webmanifest','/lifeos-icon.svg'];
-self.addEventListener('install',event=>{
- event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
-});
-self.addEventListener('activate',event=>{
- event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
-});
-self.addEventListener('fetch',event=>{
- const req=event.request;
- if(req.method!=='GET')return;
- const url=new URL(req.url);
- if(url.origin!==self.location.origin)return;
- if(url.pathname.startsWith('/__/')||url.pathname.includes('firestore')||url.pathname.includes('identitytoolkit'))return;
- if(req.mode==='navigate'){
-  event.respondWith(fetch(req).then(res=>{
-   if(res&&res.ok){const copy=res.clone();caches.open(CACHE).then(c=>c.put('/index.html',copy));}
-   return res;
-  }).catch(()=>caches.match('/index.html').then(hit=>hit||caches.match('/'))));
-  return;
- }
- if(url.pathname.startsWith('/assets/')){
-  event.respondWith(caches.match(req).then(hit=>hit||fetch(req).then(res=>{
-   if(res&&res.ok){const copy=res.clone();caches.open(CACHE).then(c=>c.put(req,copy));}
-   return res;
-  })));
- }
+const CACHE='eagleos-shell-v1';
+const FILES=['/','/index.html','/manifest.webmanifest','/eagle-icon.svg'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',e=>{
+ const r=e.request,u=new URL(r.url);
+ if(r.method!=='GET'||u.origin!==self.location.origin)return;
+ if(u.pathname.startsWith('/__/')||u.pathname.includes('firestore')||u.pathname.includes('identitytoolkit'))return;
+ if(r.mode==='navigate'){e.respondWith(fetch(r).then(res=>{if(res.ok){const c=res.clone();caches.open(CACHE).then(x=>x.put('/index.html',c));}return res;}).catch(()=>caches.match('/index.html').then(x=>x||caches.match('/'))));return;}
+ if(u.pathname.startsWith('/assets/'))e.respondWith(caches.match(r).then(x=>x||fetch(r).then(res=>{if(res.ok){const c=res.clone();caches.open(CACHE).then(y=>y.put(r,c));}return res;})));
 });
