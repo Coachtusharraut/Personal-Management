@@ -901,8 +901,10 @@ export function subscribeMissionData(userId, callback) {
         level: 1,
         title: 'Novice Warrior',
         currentXp: 0,
+        totalXp: 0,
         nextLevelXp: 500,
         streakDays: 0
+        ,lastQuestDate: ''
       }
     };
   };
