@@ -43,7 +43,7 @@ jobs:
         run: npm install --global firebase-tools
 
       - name: Deploy to the existing tusharraut Firebase Hosting target
-        if: ${{ secrets.FIREBASE_TOKEN != '' }}
+        if: env.FIREBASE_TOKEN != ''
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: firebase deploy --only hosting:tusharraut --project personal-mgmt-app --token "$FIREBASE_TOKEN"
