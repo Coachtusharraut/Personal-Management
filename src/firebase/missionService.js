@@ -903,8 +903,8 @@ export function subscribeMissionData(userId, callback) {
         currentXp: 0,
         totalXp: 0,
         nextLevelXp: 500,
-        streakDays: 0
-        ,lastQuestDate: ''
+        streakDays: 0,
+        lastQuestDate: ''
       }
     };
   };
