@@ -16,25 +16,33 @@ import {
   Palette
 } from 'lucide-react';
 import { useAuth } from '../firebase/auth';
-import { exportAllData, importAllData, INITIAL_DATA } from '../firebase/firestoreService';
+import { exportAllData, importAllData, clearAllUserData } from '../firebase/firestoreService';
 
 export default function SettingsView() {
   const { user, isGuest, loginWithGoogle, logout } = useAuth();
   const [importStatus, setImportStatus] = useState('');
   const [exportNotice, setExportNotice] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  const handleExportJSON = () => {
-    if (!user) return;
-    const jsonStr = exportAllData(user.uid);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tusharraut_os_backup_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setExportNotice(true);
-    setTimeout(() => setExportNotice(false), 3000);
+  const handleExportJSON = async () => {
+    if (!user || busy) return;
+    setBusy(true);
+    try {
+      const jsonStr = await exportAllData(user.uid);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `lifeos_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setExportNotice(true);
+      setTimeout(() => setExportNotice(false), 3000);
+    } catch (error) {
+      alert('Backup failed: ' + (error?.message || 'Unable to read your cloud data.'));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleImportJSON = (e) => {
@@ -42,30 +50,37 @@ export default function SettingsView() {
     if (!file || !user) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const content = event.target?.result;
       if (typeof content === 'string') {
-        const success = importAllData(user.uid, content);
-        if (success) {
-          setImportStatus('Data successfully restored!');
+        setBusy(true);
+        try {
+          await importAllData(user.uid, content);
+          setImportStatus('Cloud data successfully restored. Reloading…');
           setTimeout(() => window.location.reload(), 1000);
-        } else {
-          setImportStatus('Invalid JSON format.');
+        } catch (error) {
+          setImportStatus('Restore failed: ' + (error?.message || 'Invalid backup or cloud write error.'));
+        } finally {
+          setBusy(false);
         }
       }
     };
     reader.readAsText(file);
   };
 
-  const handleResetData = () => {
-    if (!user) return;
-    if (confirm('Are you sure you want to reset all data to default template? Current custom changes will be replaced.')) {
-      ['tasks', 'habits', 'notes', 'expenses', 'goals'].forEach(col => {
-        const key = `tr_mgmt_${user.uid}_${col}`;
-        localStorage.setItem(key, JSON.stringify(INITIAL_DATA[col] || []));
-      });
-      alert('Workspace reset to defaults.');
-      window.location.reload();
+  const handleResetData = async () => {
+    if (!user || busy) return;
+    if (confirm('Permanently delete all LifeOS tasks, goals, habits, notes, stories, opportunities, finances and mission progress from your cloud account? Export a backup first. This cannot be undone.')) {
+      setBusy(true);
+      try {
+        await clearAllUserData(user.uid);
+        alert('All LifeOS cloud records have been deleted.');
+        window.location.reload();
+      } catch (error) {
+        alert('Could not clear all records: ' + (error?.message || 'Unknown error.'));
+      } finally {
+        setBusy(false);
+      }
     }
   };
 
@@ -78,7 +93,7 @@ export default function SettingsView() {
           <span>System Settings & Data Sovereignty</span>
         </h2>
         <p className="text-xs text-slate-400 mt-1">
-          Manage user identity, Cloud Firestore security, backups, and display preferences.
+          Manage your owner account, cloud backups, restore and data deletion.
         </p>
       </div>
 
@@ -168,12 +183,12 @@ export default function SettingsView() {
         </div>
 
         <p className="text-xs text-slate-400 leading-relaxed">
-          Your personal data belongs entirely to you. You can export a full JSON dump of your tasks, habits, notes, finances, and goals at any time, or restore from a previous backup.
+          Your personal data belongs entirely to you. You can export a full JSON dump of your tasks, habits, goals, stories, opportunities, finances and mission progress at any time, or restore from a previous backup.
         </p>
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button
-            onClick={handleExportJSON}
+            onClick={handleExportJSON} disabled={busy}
             className="flex items-center space-x-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-800 transition shadow-sm"
           >
             <Download className="w-4 h-4 text-indigo-400" />
@@ -182,16 +197,16 @@ export default function SettingsView() {
 
           <label className="flex items-center space-x-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-800 transition cursor-pointer shadow-sm">
             <Upload className="w-4 h-4 text-emerald-400" />
-            <span>Import / Restore (.json)</span>
+            <span>{busy ? 'Working…' : 'Import / Restore (.json)'}</span>
             <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
           </label>
 
           <button
-            onClick={handleResetData}
+            onClick={handleResetData} disabled={busy}
             className="flex items-center space-x-2 px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold rounded-xl border border-rose-500/20 transition"
           >
             <Trash2 className="w-4 h-4" />
-            <span>Reset to Template</span>
+            <span>Delete All Cloud Data</span>
           </button>
         </div>
 
