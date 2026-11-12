@@ -27,17 +27,18 @@ export default function TeamsView({teams=[],ibos=[],onAddActivity,initialTeamId=
  };
  const updateFlag=async(ibo,key,value)=>{
   const after={...ibo,[key]:value};
-  await updateItem(user.uid,'ibos',ibo.id,after);
   const becameCore=after.meetingAttended&&after.bookingMade&&after.businessActive&&! (ibo.meetingAttended&&ibo.bookingMade&&ibo.businessActive);
   const stoppedCore=!after.meetingAttended||!after.bookingMade||!after.businessActive;
-  if(becameCore){celebrateEagle('win');await onAddActivity?.({type:'core_ibo_qualified',quantity:1,teamId:selected,note:after.name+' became a Core IBO'});}
-  else if(stoppedCore&&ibo.meetingAttended&&ibo.bookingMade&&ibo.businessActive){celebrateEagle('miss');}
+  if(becameCore)celebrateEagle('win');
+  else if(stoppedCore&&ibo.meetingAttended&&ibo.bookingMade&&ibo.businessActive)celebrateEagle('miss');
+  await updateItem(user.uid,'ibos',ibo.id,after);
+  if(becameCore)await onAddActivity?.({type:'core_ibo_qualified',quantity:1,teamId:selected,note:after.name+' became a Core IBO'});
  };
  const savePercent=async(team)=>{
   const n=Number(percentDraft[team.id]??team.percentage??0);
-  await updateItem(user.uid,'teams',team.id,{percentage:n});
   if(n>=3&&Number(team.percentage||0)<3)celebrateEagle('win');
   if(n<3&&Number(team.percentage||0)>=3)celebrateEagle('miss');
+  await updateItem(user.uid,'teams',team.id,{percentage:n});
  };
  if(!active)return <div className="space-y-4">
   <div className="eagle-page-heading"><span className="eagle-heading-icon">🪶</span><div><p>THE SIX WINGS</p><h1>Build your teams</h1><small>10 Core IBOs · 3%+ in each leg</small></div></div>
