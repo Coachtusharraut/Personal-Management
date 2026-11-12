@@ -50,7 +50,7 @@ export default function DailyRemindersView({
       setNotificationStatus(permission);
       if (permission === 'granted') {
         new Notification('Tushar LifeOS Reminders Active', {
-          body: 'You will receive reminders for Morning Prime (07:00), Midday Momentum (14:00), and Night Debrief (21:30).',
+          body: 'Your three daily rituals will remind you while LifeOS remains open in this browser.',
           icon: '/favicon.ico'
         });
       }
@@ -119,6 +119,7 @@ export default function DailyRemindersView({
             <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
               Prime your mental biology 3 times a day. Watch high-impact metabolic science, speaking, and warrior discipline videos directly inside LifeOS to maintain relentless growth.
             </p>
+            <p className="mt-2 text-[10px] text-amber-200/80">Browser notifications run only while LifeOS is open. Background reminders after closing the app require a separate push-notification service.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
