@@ -4,42 +4,159 @@
 
 :root {
   color-scheme: dark;
+  --lifeos-navy: #091a35;
+  --lifeos-ink: #070b14;
+  --lifeos-gold: #f3c96b;
+  --lifeos-safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+html, body, #root { min-height: 100%; }
+html { background: var(--lifeos-ink); }
 body {
+  margin: 0;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
 }
-
-/* Glassmorphism helpers */
-.glass-panel {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+button, a, input, textarea, select { touch-action: manipulation; }
+button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid rgba(243,201,107,.75);
+  outline-offset: 2px;
 }
+img { max-width: 100%; }
 
-.glass-card {
-  background: rgba(24, 34, 52, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+/* Shared app surfaces */
+.glass-panel { background: rgba(17,24,39,.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.08); }
+.glass-card { background: rgba(24,34,52,.6); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.06); }
+.lifeos-topbar { padding-top: env(safe-area-inset-top, 0px); }
+.lifeos-brand-avatar {
+  width: 37px; height: 37px; flex: 0 0 37px; overflow: hidden;
+  border-radius: 13px; display: grid; place-items: center;
+  background: linear-gradient(145deg,#f7d78c,#a95b2c);
+  border: 1px solid rgba(255,220,150,.55);
 }
-
-/* Custom subtle scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.lifeos-brand-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; mix-blend-mode: screen; }
+.lifeos-add-button {
+  min-width: 42px; min-height: 42px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 14px; background: linear-gradient(135deg,#f5d17e,#e6a83d); color: #111827; font-size: 12px; font-weight: 900;
+  box-shadow: 0 6px 20px rgba(223,164,55,.16);
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
+.lifeos-profile-button {
+  width: 42px; height: 42px; border-radius: 15px; display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.07); color: #f5d17e; font-weight: 900;
+  overflow: hidden;
 }
+.lifeos-profile-button img { width: 100%; height: 100%; object-fit: cover; }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
-  border-radius: 9999px;
+/* Compact, character-led home screen */
+.lifeos-hero {
+  min-height: 178px;
+  background:
+    radial-gradient(circle at 80% 30%, rgba(242,173,70,.20), transparent 34%),
+    linear-gradient(125deg,#172b49 0%,#101b32 55%,#25172b 100%);
+  box-shadow: 0 14px 38px rgba(0,0,0,.18);
 }
+.lifeos-mascot-wrap { position: relative; width: 112px; height: 142px; display: flex; align-items: flex-end; justify-content: center; }
+.lifeos-mascot { width: 112px; height: 142px; object-fit: cover; object-position: 50% 15%; mix-blend-mode: screen; filter: drop-shadow(0 8px 14px rgba(0,0,0,.22)); }
+.lifeos-mascot-spark { position: absolute; top: 3px; right: 2px; font-size: 23px; animation: lifeos-float 3s ease-in-out infinite; }
+.lifeos-stat-card {
+  min-width: 0; min-height: 100px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  border-radius: 19px; border: 1px solid rgba(255,255,255,.075); background: linear-gradient(145deg,rgba(26,39,59,.92),rgba(12,20,35,.96));
+  transition: transform .16s ease, border-color .16s ease;
+}
+.lifeos-stat-card:active { transform: scale(.97); border-color: rgba(243,201,107,.35); }
+.lifeos-stat-icon { font-size: 19px; line-height: 1.1; }
+.lifeos-stat-value { font-size: 20px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
+.lifeos-stat-label { font-size: 9px; font-weight: 700; color: #9caec4; text-align: center; }
+.lifeos-quest-card {
+  width: 100%; min-height: 68px; display: flex; align-items: center; gap: 11px; padding: 12px;
+  border-radius: 18px; border: 1px solid rgba(243,201,107,.15); background: linear-gradient(120deg,rgba(20,34,54,.96),rgba(12,21,36,.98));
+  transition: transform .15s ease, border-color .15s ease;
+}
+.lifeos-quest-card:active { transform: scale(.99); }
+.lifeos-quest-card.is-done { border-color: rgba(52,211,153,.2); background: rgba(16,45,45,.52); }
+.lifeos-quest-number { width: 29px; height: 29px; flex: 0 0 29px; display: grid; place-items: center; border-radius: 10px; background: rgba(243,201,107,.13); color: #f4d58b; font-size: 12px; font-weight: 900; }
+.lifeos-quest-check { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 12px; color: #d7a948; background: rgba(243,201,107,.08); }
+.lifeos-quest-check.checked { background: rgba(52,211,153,.15); color: #6ee7b7; }
+.lifeos-launch-card {
+  min-height: 126px; padding: 14px; border-radius: 19px; border: 1px solid rgba(255,255,255,.07); text-align: left;
+  background: linear-gradient(140deg,rgba(22,37,59,.96),rgba(10,19,33,.98)); transition: transform .15s ease, border-color .15s ease;
+}
+.lifeos-launch-card:active { transform: scale(.98); border-color: rgba(243,201,107,.35); }
+.lifeos-cheer { margin-bottom: 4px; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.4);
+/* Native-feeling bottom bar */
+.lifeos-bottom-nav {
+  position: fixed; z-index: 60; left: 0; right: 0; bottom: 0;
+  min-height: calc(66px + var(--lifeos-safe-bottom));
+  padding: 5px 7px calc(5px + var(--lifeos-safe-bottom));
+  display: flex; align-items: center; justify-content: space-around; gap: 3px;
+  background: rgba(7,11,20,.97); border-top: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+}
+.lifeos-tab {
+  flex: 1 1 0; min-width: 0; min-height: 56px; border-radius: 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  color: #8191a8; font-size: 10px; font-weight: 800; letter-spacing: .01em;
+  transition: background .16s ease, color .16s ease, transform .16s ease;
+}
+.lifeos-tab.active { color: #f6d48b; background: rgba(243,201,107,.11); }
+.lifeos-tab:active { transform: scale(.94); }
+.lifeos-more-overlay {
+  position: fixed; inset: 0; bottom: calc(66px + var(--lifeos-safe-bottom)); z-index: 55;
+  display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.56); backdrop-filter: blur(5px);
+}
+.lifeos-more-sheet {
+  width: 100%; max-height: min(76dvh,640px); overflow-y: auto; overscroll-behavior: contain;
+  padding: 10px 16px 20px; border: 1px solid rgba(255,255,255,.09); border-bottom: 0;
+  border-radius: 26px 26px 0 0; background: linear-gradient(160deg,#17253a,#0b1424 70%);
+  box-shadow: 0 -18px 45px rgba(0,0,0,.35); animation: lifeos-rise .2s ease-out;
+}
+.lifeos-sheet-handle { width: 38px; height: 4px; margin: 0 auto 15px; border-radius: 99px; background: #526176; }
+.lifeos-more-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.lifeos-more-item {
+  min-height: 65px; min-width: 0; padding: 10px; display: flex; align-items: center; gap: 10px; text-align: left;
+  border-radius: 15px; border: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.035);
+}
+.lifeos-more-item:active { background: rgba(243,201,107,.1); border-color: rgba(243,201,107,.25); }
+.lifeos-more-icon { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; border-radius: 12px; background: rgba(243,201,107,.1); color: #f3cf80; }
+
+/* Forms and touch targets */
+input, select, textarea { font-size: 16px; }
+button, a, [role="button"] { -webkit-user-select: none; user-select: none; }
+input, textarea, select { -webkit-user-select: text; user-select: text; }
+main { overscroll-behavior: contain; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148,163,184,.2); border-radius: 999px; }
+
+@keyframes lifeos-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes lifeos-rise { from { transform: translateY(16px); opacity: .7; } to { transform: translateY(0); opacity: 1; } }
+
+@media (max-width: 767px) {
+  html, body, #root { min-height: 100dvh; }
+  body { font-size: 14px; }
+  .lifeos-home { gap: 16px; }
+  .lifeos-hero { min-height: 162px; padding: 14px; }
+  .lifeos-mascot-wrap { width: 88px; height: 126px; margin-right: -3px; }
+  .lifeos-mascot { width: 92px; height: 126px; }
+  .lifeos-stat-card { min-height: 91px; padding: 9px 5px; border-radius: 16px; }
+  .lifeos-stat-value { font-size: 19px; }
+  .lifeos-launch-card { min-height: 112px; padding: 12px; }
+  .lifeos-topbar { box-shadow: 0 4px 16px rgba(0,0,0,.16); }
+  main { width: 100%; }
+}
+@media (max-width: 360px) {
+  .lifeos-mascot-wrap { width: 74px; }
+  .lifeos-mascot { width: 78px; }
+  .lifeos-stat-label { font-size: 8px; }
+  .lifeos-quest-card { gap: 8px; padding: 10px; }
+}
+@media (min-width: 768px) {
+  .lifeos-bottom-nav, .lifeos-more-overlay { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
