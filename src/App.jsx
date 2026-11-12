@@ -22,6 +22,11 @@ import NotesView from './modules/NotesView';
 import FinanceView from './modules/FinanceView';
 import FocusTimerView from './modules/FocusTimerView';
 import SettingsView from './modules/SettingsView';
+import AuthGate from './components/AuthGate';
+import CareerGrowthView from './modules/CareerGrowthView';
+import StoryForgeView from './modules/StoryForgeView';
+import OpportunitiesView from './modules/OpportunitiesView';
+import CalendarView from './modules/CalendarView';
 
 import { 
   Bot, 
@@ -37,7 +42,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const { user } = useAuth();
+  const { user, loading, isGuest } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -55,6 +60,8 @@ export default function App() {
   const [notes, setNotes] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [goals, setGoals] = useState([]);
+  const [stories, setStories] = useState([]);
+  const [opportunities, setOpportunities] = useState([]);
 
   useEffect(() => {
     if (!user) return;
@@ -64,6 +71,8 @@ export default function App() {
     const unsubNotes = subscribeCollection(user.uid, 'notes', setNotes);
     const unsubExpenses = subscribeCollection(user.uid, 'expenses', setExpenses);
     const unsubGoals = subscribeCollection(user.uid, 'goals', setGoals);
+    const unsubStories = subscribeCollection(user.uid, 'stories', setStories);
+    const unsubOpportunities = subscribeCollection(user.uid, 'opportunities', setOpportunities);
 
     return () => {
       unsubMission();
@@ -72,6 +81,8 @@ export default function App() {
       unsubNotes();
       unsubExpenses();
       unsubGoals();
+      unsubStories();
+      unsubOpportunities();
     };
   }, [user]);
 
@@ -107,6 +118,9 @@ export default function App() {
   const todayStr = new Date().toISOString().split('T')[0];
   const pendingTasks = tasks.filter(t => t.status !== 'done').length;
   const pendingHabitsToday = habits.filter(h => !h.history || !h.history[todayStr]).length;
+
+  if (loading) return <div className="min-h-screen bg-[#070b14] text-slate-200 grid place-items-center"><div className="text-center"><div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-2 border-amber-300/20 border-t-amber-300"/><p className="text-sm font-bold">Securing your LifeOS…</p></div></div>;
+  if (!user || isGuest) return <AuthGate />;
 
   return (
     <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200 relative">
@@ -186,6 +200,11 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'career' && <CareerGrowthView goals={goals} missionState={missionState} onAddQuest={handleAddQuestFromSource} onNavigate={setActiveTab} />}
+          {activeTab === 'story_forge' && <StoryForgeView missionState={missionState} stories={stories} onAddQuest={handleAddQuestFromSource} />}
+          {activeTab === 'opportunities' && <OpportunitiesView opportunities={opportunities} onAddQuest={handleAddQuestFromSource} />}
+          {activeTab === 'calendar' && <CalendarView tasks={tasks} />}
+
           {activeTab === 'goal_hierarchy' && (
             <GoalHierarchyView 
               missionState={missionState}
@@ -219,27 +238,15 @@ export default function App() {
       </div>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b14]/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-2 flex items-center justify-around">
-        {[
-          { id: 'dashboard', label: 'Board', icon: NAV_ITEMS[0].icon },
-          { id: 'reminders', label: '3x Videos', icon: Bell },
-          { id: 'mood', label: 'Mood', icon: Sparkles },
-          { id: 'campaign', label: '₹1L', icon: Flame },
-          { id: 'chronicles', label: 'Story', icon: BookOpen },
-          { id: 'boss', label: 'Boss', icon: Sword }
-        ].map((item) => {
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b14]/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-2 flex items-center gap-1 overflow-x-auto">
+        {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center justify-center p-1.5 rounded-xl text-[10px] font-bold transition ${
-                isActive ? 'text-amber-400' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Icon className="w-5 h-5 mb-0.5" />
-              <span>{item.label}</span>
+            <button key={item.id} onClick={() => setActiveTab(item.id)} aria-label={item.label}
+              className={`min-w-[62px] flex-shrink-0 flex flex-col items-center justify-center px-1.5 py-1.5 rounded-xl text-[9px] font-bold transition ${isActive ? 'text-amber-300 bg-amber-300/10' : 'text-slate-500 hover:text-slate-200'}`}>
+              <Icon className="w-4 h-4 mb-0.5" />
+              <span className="max-w-[70px] truncate">{item.label}</span>
             </button>
           );
         })}
