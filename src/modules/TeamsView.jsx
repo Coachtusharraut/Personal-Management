@@ -1,4 +1,4 @@
-import React,{useMemo,useState} from 'react';
+import React,{useMemo,useState,useEffect} from 'react';
 import {addItem,updateItem,deleteItem} from '../firebase/firestoreService';
 import {useAuth} from '../firebase/auth';
 import {ArrowLeft,Plus,Check,Users,Target,Trash2,ChevronDown,ChevronUp,Star,Save,UserPlus} from 'lucide-react';
@@ -12,6 +12,7 @@ export default function TeamsView({teams=[],ibos=[],onAddActivity,initialTeamId=
  const [phone,setPhone]=useState('');
  const [percentDraft,setPercentDraft]=useState({});
  const [saving,setSaving]=useState(false);
+ useEffect(()=>{if(initialTeamId)setSelected(initialTeamId);},[initialTeamId]);
  const active=teams.find(t=>t.id===selected);
  const members=ibos.filter(x=>x.teamId===selected);
  const coreCount=members.filter(x=>x.meetingAttended&&x.bookingMade&&x.businessActive).length;
