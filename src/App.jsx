@@ -86,6 +86,34 @@ export default function App() {
     };
   }, [user]);
 
+  // Ritual reminders are checked while the authenticated LifeOS app is open.
+  useEffect(() => {
+    if (!user || !missionState?.dailyReminders?.length || !('Notification' in window) || Notification.permission !== 'granted') return;
+    const checkRituals = () => {
+      const clock = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
+      const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+      missionState.dailyReminders.forEach((slot) => {
+        const match = String(slot.time || '').match(/([01]\d|2[0-3]):([0-5]\d)/);
+        if (!match || clock !== match[0]) return;
+        const key = 'lifeos-ritual-' + user.uid + '-' + slot.id + '-' + day;
+        if (localStorage.getItem(key)) return;
+        try {
+          new Notification(slot.slotName || 'LifeOS daily ritual', {
+            body: slot.quote || 'Open LifeOS for your next ritual.',
+            tag: key,
+            icon: '/favicon.ico'
+          });
+          localStorage.setItem(key, '1');
+        } catch (error) {
+          console.warn('Ritual notification was not displayed:', error);
+        }
+      });
+    };
+    checkRituals();
+    const timer = window.setInterval(checkRituals, 20000);
+    return () => window.clearInterval(timer);
+  }, [missionState?.dailyReminders, user?.uid]);
+
   // Handler to persist mission state changes
   const handleSaveMissionState = (updates) => {
     if (!user) return;
