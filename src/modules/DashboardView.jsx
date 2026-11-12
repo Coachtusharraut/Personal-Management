@@ -87,11 +87,28 @@ export default function DashboardView({
       return q;
     });
 
-    // Award XP
+    // Award genuine XP, track lifetime XP for story unlocks, and roll rank progress forward.
     const xpDelta = willBeCompleted ? (targetQuest?.xp || 50) : -(targetQuest?.xp || 50);
+    const totalXp = Math.max(0, (userLevel.totalXp ?? userLevel.currentXp ?? 0) + xpDelta);
+    const level = Math.floor(totalXp / 500) + 1;
+    const levelStartXp = (level - 1) * 500;
+    const levelTitles = ['Novice Warrior','Disciplined Archer','Pathfinder','Dharma Vanguard','Champion','Legacy Builder','Master of the Path'];
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+    const yesterdayDate = new Date(Date.now() - 86400000);
+    const yesterday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(yesterdayDate);
+    const lastQuestDate = userLevel.lastQuestDate || '';
+    const streakDays = willBeCompleted
+      ? (lastQuestDate === today ? (userLevel.streakDays || 0) : lastQuestDate === yesterday ? (userLevel.streakDays || 0) + 1 : 1)
+      : (userLevel.streakDays || 0);
     const updatedLevel = {
       ...userLevel,
-      currentXp: Math.max(0, userLevel.currentXp + xpDelta)
+      totalXp,
+      level,
+      title: levelTitles[Math.min(level - 1, levelTitles.length - 1)],
+      currentXp: totalXp - levelStartXp,
+      nextLevelXp: 500,
+      streakDays,
+      lastQuestDate: willBeCompleted ? today : lastQuestDate
     };
 
     if (willBeCompleted) {
