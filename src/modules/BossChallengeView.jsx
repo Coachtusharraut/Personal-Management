@@ -20,8 +20,8 @@ export default function BossChallengeView({ missionState, onNavigate }) {
   const dailyQuests = missionState?.dailyQuests || [];
 
   // Calculate live dynamic damage dealt from real achievements!
-  const revenueCollected = campaign?.financials?.collected || 25000;
-  const consultationsCompleted = campaign?.activity?.consultationsCompleted || 5;
+  const revenueCollected = campaign?.financials?.collected || 0;
+  const consultationsCompleted = campaign?.activity?.consultationsCompleted || 0;
   const questsDone = dailyQuests.filter(q => q.completed).length;
 
   const totalDamageDealt = revenueCollected + (consultationsCompleted * 2500) + (questsDone * 500);
