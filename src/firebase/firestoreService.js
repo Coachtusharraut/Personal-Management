@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 
-export const DATA_COLLECTIONS = ['tasks','habits','notes','expenses','goals','stories','opportunities'];
+export const DATA_COLLECTIONS = ['tasks','habits','notes','expenses','goals','stories','opportunities','teams','prospects','ibos','activities'];
 export const INITIAL_DATA = {
   tasks: [],
   habits: [],
@@ -21,7 +21,11 @@ export const INITIAL_DATA = {
   expenses: [],
   goals: [],
   stories: [],
-  opportunities: []
+  opportunities: [],
+  teams: [],
+  prospects: [],
+  ibos: [],
+  activities: []
 };
 
 const getLocalKey = (userId, collectionName) => `tr_mgmt_${userId}_${collectionName}`;
@@ -128,6 +132,40 @@ export async function importAllData(userId,jsonString) {
     await setDoc(doc(db,'users',userId,'lifeos_mission','primary'),parsed.lifeos_mission,{merge:false});
   }
   return true;
+}
+
+export async function ensureEagleTeams(userId) {
+  requireOwner(userId);
+  const colRef = collection(db, 'users', userId, 'teams');
+  const existing = await getDocs(colRef);
+  if (!existing.empty) return existing.docs.map(d => ({ id: d.id, ...d.data() }));
+  const palette = ['#e6b84d','#d97845','#4ea6a1','#9274c8','#6a9bd4','#70a76c'];
+  const batch = writeBatch(db);
+  const seeded = Array.from({ length: 6 }, (_, index) => {
+    const id = 'eagle-team-' + (index + 1);
+    const team = {
+      name: 'Team ' + (index + 1),
+      index: index + 1,
+      color: palette[index],
+      percentage: 0,
+      targetCoreIbos: 10,
+      createdAt: new Date().toISOString()
+    };
+    batch.set(doc(db, 'users', userId, 'teams', id), team);
+    return { id, ...team };
+  });
+  await batch.commit();
+  writeCache(userId, 'teams', seeded);
+  return seeded;
+}
+
+export function getCoreIboCount(ibos, teamId) {
+  return (ibos || []).filter(ibo =>
+    ibo.teamId === teamId &&
+    ibo.meetingAttended === true &&
+    ibo.bookingMade === true &&
+    ibo.businessActive === true
+  ).length;
 }
 
 export async function clearAllUserData(userId) {
