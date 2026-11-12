@@ -1,0 +1,129 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // This security rules file assumes the following data structures:
+    //
+    // Collection: /users/{userId}
+    // Document ID: Firebase Authentication UID
+    // Fields (User profile / preferences):
+    //   - displayName: string (optional)
+    //   - email: string (optional)
+    //   - photoURL: string (optional)
+    //   - preferences: map (optional)
+    //   - createdAt: string or timestamp (optional)
+    //   - updatedAt: string or timestamp (optional)
+    //
+    // Subcollections: /users/{userId}/{document=**}
+    //   All subcollections belong strictly to the authenticated user identified by {userId}.
+    //   Primary subcollections for the Personal Management application include:
+    //
+    //   - /users/{userId}/tasks/{taskId}
+    //     Fields:
+    //       - id: string (optional)
+    //       - title: string (required)
+    //       - description: string (optional)
+    //       - status: string (required, 'todo' | 'in-progress' | 'review' | 'done')
+    //       - priority: string (optional, 'low' | 'medium' | 'high' | 'urgent')
+    //       - category: string (optional)
+    //       - dueDate: string (optional)
+    //       - subtasks: list of maps [{ id, text, completed }] (optional)
+    //       - createdAt: string (optional)
+    //       - serverTime: timestamp (optional)
+    //
+    //   - /users/{userId}/habits/{habitId}
+    //     Fields:
+    //       - id: string (optional)
+    //       - name: string (required)
+    //       - description: string (optional)
+    //       - category: string (optional)
+    //       - streak: int / number (optional)
+    //       - targetDays: int / number (optional)
+    //       - history: map of date string -> bool (optional)
+    //       - createdAt: string (optional)
+    //       - serverTime: timestamp (optional)
+    //
+    //   - /users/{userId}/notes/{noteId}
+    //     Fields:
+    //       - id: string (optional)
+    //       - title: string (required)
+    //       - content: string (optional)
+    //       - category: string (optional)
+    //       - pinned: bool (optional)
+    //       - updatedAt: string (optional)
+    //       - createdAt: string (optional)
+    //       - serverTime: timestamp (optional)
+    //
+    //   - /users/{userId}/expenses/{expenseId}
+    //     Fields:
+    //       - id: string (optional)
+    //       - description: string (required)
+    //       - amount: number (required)
+    //       - type: string (required, 'expense' | 'income')
+    //       - category: string (optional)
+    //       - date: string (optional)
+    //       - createdAt: string (optional)
+    //       - serverTime: timestamp (optional)
+    //
+    //   - /users/{userId}/goals/{goalId}
+    //     Fields:
+    //       - id: string (optional)
+    //       - title: string (required)
+    //       - category: string (optional)
+    //       - targetDate: string (optional)
+    //       - progress: int / number (optional)
+    //       - milestones: list of maps [{ text, done }] (optional)
+    //       - createdAt: string (optional)
+    //       - serverTime: timestamp (optional)
+    //
+    // Security Invariants:
+    //   1. Default Deny: All access across root and other collections is denied by default.
+    //   2. Owner-Only Access: Only the authenticated user whose request.auth.uid matches
+    //      {userId} may read, list, create, update, or delete /users/{userId} and any
+    //      subcollection documents under /users/{userId}/{document=**}.
+    //   3. No Unauthenticated Access: Unauthenticated clients are rejected from all operations.
+    //   4. Cross-User Isolation: No user can access or tamper with another user's records.
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Verify user is authenticated with Firebase Authentication
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Verify user is the owner of the document path based on auth UID
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ===============================================================
+    // Default Deny Rule
+    // ===============================================================
+    // Explicitly reject all reads and writes across the entire database by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===============================================================
+    // User Collection & Subcollections Rules
+    // ===============================================================
+    // Only the authenticated user matching {userId} can read or write their user doc
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Matches all subcollections (/users/{userId}/{document=**}) at any depth
+      // (e.g. tasks, habits, notes, expenses, goals, and any nested sub-docs)
+      match /{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}
