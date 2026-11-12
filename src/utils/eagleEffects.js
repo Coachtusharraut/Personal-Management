@@ -23,6 +23,12 @@ export function playEagleSound(kind='win'){
 }
 export function celebrateEagle(kind='win'){
   playEagleSound(kind);
+  try {
+    const root = document.querySelector('.eagle-app');
+    const mood = kind === 'win' ? 'eagle-win' : 'eagle-loss';
+    root?.classList.add(mood);
+    window.setTimeout(() => root?.classList.remove(mood), 1800);
+  } catch (error) { console.warn('Eagle animation unavailable:', error); }
   if(kind==='win'){
     import('canvas-confetti').then(({default:confetti})=>{
       confetti({particleCount:100,spread:75,startVelocity:42,origin:{y:.65},colors:['#f4cb72','#ffe6a8','#ffffff','#dc8d35']});
