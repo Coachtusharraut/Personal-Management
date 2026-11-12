@@ -16,7 +16,7 @@ import {
   Settings,
   ShieldCheck,
   Target,
-  BriefcaseBusiness,
+  Briefcase,
   Mic2,
   CalendarDays,
   Compass
@@ -31,7 +31,7 @@ export const NAV_ITEMS = [
   { id: 'mission_lab', label: 'Mission Lab: Obesity-Free', icon: FlaskConical, badge: 'ReshapeNation' },
   { id: 'campaign', label: 'Speak to Impact ₹1L', icon: Flame, badge: 'Active' },
   { id: 'goal_hierarchy', label: 'Goal Hierarchy & Vision', icon: Layers, badge: null },
-  { id: 'career', label: 'Career & Life Goals', icon: BriefcaseBusiness, badge: 'Tracks' },
+  { id: 'career', label: 'Career & Life Goals', icon: Briefcase, badge: 'Tracks' },
   { id: 'story_forge', label: 'Story & Speaking Forge', icon: Mic2, badge: 'Chronicle' },
   { id: 'opportunities', label: 'Opportunity Radar', icon: Compass, badge: 'Pipeline' },
   { id: 'calendar', label: 'Calendar & Reminders', icon: CalendarDays, badge: 'Sync' },
