@@ -12,6 +12,8 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
     steps:
       - name: Checkout LifeOS
         uses: actions/checkout@v4
@@ -37,7 +39,7 @@ jobs:
           retention-days: 14
 
       - name: Install Firebase CLI
-        if: ${{ secrets.FIREBASE_TOKEN != '' }}
+        if: env.FIREBASE_TOKEN != ''
         run: npm install --global firebase-tools
 
       - name: Deploy to the existing tusharraut Firebase Hosting target
@@ -47,7 +49,7 @@ jobs:
         run: firebase deploy --only hosting:tusharraut --project personal-mgmt-app --token "$FIREBASE_TOKEN"
 
       - name: Explain deployment secret requirement
-        if: ${{ secrets.FIREBASE_TOKEN == '' }}
+        if: env.FIREBASE_TOKEN == ''
         run: |
           echo "Production build succeeded."
           echo "Firebase deployment was skipped because the repository secret FIREBASE_TOKEN is not configured."
