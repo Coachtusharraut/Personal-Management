@@ -138,8 +138,10 @@ export default function CalendarView({tasks=[]}){
 
  const enableNotifications=async()=>{
    if(!('Notification'in window)){setNotificationPermission('unsupported');return;}
-   const p=await Notification.requestPermission();setNotificationPermission(p);
-   if(p==='granted'){new Notification('LifeOS reminders are on',{body:'While LifeOS is open, tasks due within 10 minutes will trigger a reminder.'});}
+   try{
+     const p=await Notification.requestPermission();setNotificationPermission(p);
+     if(p==='granted'){new Notification('LifeOS reminders are on',{body:'While LifeOS is open, tasks due within 10 minutes will trigger a reminder.'});}
+   }catch(error){setNotificationPermission('denied');setError('This browser or embedded page did not allow notification permission. Use Google Calendar event reminders for reliable alerts.');}
  };
 
  const dateGroups=upcoming.reduce((acc,t)=>{const d=t.dueDate||t.date||'Unscheduled';(acc[d]||(acc[d]=[])).push(t);return acc;},{});
