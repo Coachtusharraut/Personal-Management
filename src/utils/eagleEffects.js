@@ -4,14 +4,14 @@ export function playEagleSound(kind='win'){
     if(!AudioContext)return;
     const ctx=new AudioContext();
     const now=ctx.currentTime;
-    const notes=kind==='win'?[392,523.25,659.25,783.99]:kind==='miss'?[392,329.63,261.63]:[480,620,530];
+    const notes=kind==='win'?[392,523.25,659.25,783.99]:kind==='miss'?[392,329.63,261.63]:kind==='eagle'?[980,1260,900,1180]:[480,620,530];
     notes.forEach((frequency,index)=>{
       const osc=ctx.createOscillator();
       const gain=ctx.createGain();
-      osc.type=kind==='miss'?'triangle':'sine';
+      osc.type=kind==='miss'?'triangle':kind==='eagle'?'sawtooth':'sine';
       osc.frequency.setValueAtTime(frequency,now+index*.12);
       gain.gain.setValueAtTime(.0001,now+index*.12);
-      gain.gain.exponentialRampToValueAtTime(kind==='win'?.16:.10,now+index*.12+.025);
+      gain.gain.exponentialRampToValueAtTime(kind==='win'?.16:kind==='eagle'?.055:.10,now+index*.12+.025);
       gain.gain.exponentialRampToValueAtTime(.0001,now+index*.12+.22);
       osc.connect(gain);gain.connect(ctx.destination);
       osc.start(now+index*.12);osc.stop(now+index*.12+.24);
