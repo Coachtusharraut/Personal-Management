@@ -36,6 +36,7 @@ export default function TeamsView({teams=[],ibos=[],onAddActivity,initialTeamId=
   const n=Number(percentDraft[team.id]??team.percentage??0);
   await updateItem(user.uid,'teams',team.id,{percentage:n});
   if(n>=3&&Number(team.percentage||0)<3)celebrateEagle('win');
+  if(n<3&&Number(team.percentage||0)>=3)celebrateEagle('miss');
  };
  if(!active)return <div className="space-y-4">
   <div className="eagle-page-heading"><span className="eagle-heading-icon">🪶</span><div><p>THE SIX WINGS</p><h1>Build your teams</h1><small>10 Core IBOs · 3%+ in each leg</small></div></div>
