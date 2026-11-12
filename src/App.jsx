@@ -201,7 +201,7 @@ export default function App() {
           )}
 
           {activeTab === 'career' && <CareerGrowthView goals={goals} missionState={missionState} onAddQuest={handleAddQuestFromSource} onNavigate={setActiveTab} />}
-          {activeTab === 'story_forge' && <StoryForgeView missionState={missionState} stories={stories} onAddQuest={handleAddQuestFromSource} />}
+          {activeTab === 'story_forge' && <StoryForgeView missionState={missionState} stories={stories} tasks={tasks} habits={habits} opportunities={opportunities} onAddQuest={handleAddQuestFromSource} />}
           {activeTab === 'opportunities' && <OpportunitiesView opportunities={opportunities} onAddQuest={handleAddQuestFromSource} />}
           {activeTab === 'calendar' && <CalendarView tasks={tasks} />}
 
