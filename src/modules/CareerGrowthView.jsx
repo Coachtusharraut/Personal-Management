@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { addItem, updateItem, deleteItem } from '../firebase/firestoreService';
 import { useAuth } from '../firebase/auth';
-import { Target, HeartPulse, Mic2, Brain, BriefcaseBusiness, Wallet, Users, Plane, Plus, Check, ChevronDown, ChevronUp, Trash2, Sparkles, Swords, CalendarDays, ArrowUpRight } from 'lucide-react';
+import { Target, HeartPulse, Mic2, Brain, Briefcase, Wallet, Users, Plane, Plus, Check, ChevronDown, ChevronUp, Trash2, Sparkles, Swords, CalendarDays, ArrowUpRight } from 'lucide-react';
 
 const SUGGESTIONS = [
   { title:'Empower 10,000 engineers to transform their health', category:'Mission & Impact', why:'Turn the Holistic Health for Engineers mission into measurable lives changed.', nextAction:'Define the first 100-person milestone and the channel to reach them.', milestones:['Define the measurable transformation outcome','Create a repeatable 30-day starter pathway','Build the first 100-engineer cohort','Document outcomes and referrals','Scale the system toward 10,000 engineers'] },
@@ -15,7 +15,7 @@ const SUGGESTIONS = [
 ];
 
 const CATEGORIES=['All','Mission & Impact','Business & Career','Wealth & Finance','Speaking & Influence','Learning & Innovation','Health & Fitness','People & Relationships','Experiences & Freedom'];
-const CATEGORY_ICON={'Mission & Impact':Target,'Business & Career':BriefcaseBusiness,'Wealth & Finance':Wallet,'Speaking & Influence':Mic2,'Learning & Innovation':Brain,'Health & Fitness':HeartPulse,'People & Relationships':Users,'Experiences & Freedom':Plane};
+const CATEGORY_ICON={'Mission & Impact':Target,'Business & Career':Briefcase,'Wealth & Finance':Wallet,'Speaking & Influence':Mic2,'Learning & Innovation':Brain,'Health & Fitness':HeartPulse,'People & Relationships':Users,'Experiences & Freedom':Plane};
 
 function progressOf(goal){const ms=goal.milestones||[];if(ms.length)return Math.round(ms.filter(m=>m.done).length/ms.length*100);return Math.max(0,Math.min(100,Number(goal.progress)||0));}
 
@@ -26,6 +26,8 @@ export default function CareerGrowthView({goals=[],missionState,onAddQuest,onNav
  const [expanded,setExpanded]=useState('');
  const [draft,setDraft]=useState({title:'',category:'Business & Career',why:'',targetDate:'',nextAction:''});
  const [actionDraft,setActionDraft]=useState({});
+ const [progressDraft,setProgressDraft]=useState({});
+ const [milestoneDraft,setMilestoneDraft]=useState({});
  const xp=missionState?.userLevel?.currentXp||0;
  const level=missionState?.userLevel?.level||1;
  const existingTitles=new Set(goals.map(g=>(g.title||'').toLowerCase()));
@@ -100,8 +102,9 @@ export default function CareerGrowthView({goals=[],missionState,onAddQuest,onNav
       {!!goal.targetDate&&<p className="mt-3 text-[11px] text-slate-500 flex items-center gap-1"><CalendarDays size={13}/> Target: {new Date(goal.targetDate+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</p>}
       {goal.nextAction&&<div className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-400/5 p-3"><p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Next action</p><p className="mt-1 text-xs text-slate-200">{goal.nextAction}</p></div>}
       {goal.milestones?.length>0&&<div className="mt-4 space-y-2"><p className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Milestones</p>{goal.milestones.map((m,i)=><button key={m.id||i} onClick={()=>toggleMilestone(goal,m.id)} className="flex w-full items-center gap-2 text-left text-xs"><span className={'grid h-5 w-5 place-items-center rounded-md border '+(m.done?'bg-emerald-400 border-emerald-400 text-[#07101e]':'border-slate-600 text-slate-500')}>{m.done?<Check size={13}/>:null}</span><span className={m.done?'text-slate-500 line-through':'text-slate-300'}>{m.title||m.text}</span></button>)}</div>}
+      {(!goal.milestones||goal.milestones.length===0)&&<div className="mt-4"><div className="flex items-center justify-between text-[10px] text-slate-500"><span>Manual progress</span><span>{progressDraft[goal.id]??goal.progress??0}%</span></div><input type="range" min="0" max="100" step="5" value={progressDraft[goal.id]??goal.progress??0} onChange={e=>setProgressDraft({...progressDraft,[goal.id]:Number(e.target.value)})} onMouseUp={()=>updateItem(user.uid,'goals',goal.id,{progress:progressDraft[goal.id]??goal.progress??0})} onTouchEnd={()=>updateItem(user.uid,'goals',goal.id,{progress:progressDraft[goal.id]??goal.progress??0})} className="mt-2 w-full accent-amber-300"/></div>}
       <div className="mt-5 flex flex-wrap gap-2"><button onClick={()=>{setExpanded(isOpen?'':goal.id);setActionDraft({...actionDraft,[goal.id]:goal.nextAction||''})}} className="flex items-center gap-1 rounded-xl bg-slate-800 px-3 py-2 text-[11px] font-bold text-slate-200">{isOpen?'Close editor':'Edit next action'}{isOpen?<ChevronUp size={13}/>:<ChevronDown size={13}/>}</button><button disabled={!goal.nextAction} onClick={()=>createQuest(goal)} className="flex items-center gap-1 rounded-xl bg-amber-300 px-3 py-2 text-[11px] font-black text-[#091a35] disabled:opacity-40"><Sparkles size={13}/> Turn into quest</button><button onClick={()=>{if(confirm('Delete this goal and its milestones?'))deleteItem(user.uid,'goals',goal.id)}} className="ml-auto rounded-xl p-2 text-slate-500 hover:bg-rose-500/10 hover:text-rose-300"><Trash2 size={14}/></button></div>
-      {isOpen&&<div className="mt-3 flex gap-2"><input value={actionDraft[goal.id]??''} onChange={e=>setActionDraft({...actionDraft,[goal.id]:e.target.value})} placeholder="Write the next visible action…" className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"/><button onClick={()=>saveAction(goal)} className="rounded-xl bg-emerald-400 px-3 py-2 text-xs font-black text-[#07101e]">Save</button></div>}
+      {isOpen&&<div className="mt-3 space-y-2"><div className="flex gap-2"><input value={actionDraft[goal.id]??''} onChange={e=>setActionDraft({...actionDraft,[goal.id]:e.target.value})} placeholder="Write the next visible action…" className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"/><button onClick={()=>saveAction(goal)} className="rounded-xl bg-emerald-400 px-3 py-2 text-xs font-black text-[#07101e]">Save action</button></div><div className="flex gap-2"><input value={milestoneDraft[goal.id]||''} onChange={e=>setMilestoneDraft({...milestoneDraft,[goal.id]:e.target.value})} placeholder="Add a milestone…" className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"/><button onClick={async()=>{const title=(milestoneDraft[goal.id]||'').trim();if(!title)return;const milestones=[...(goal.milestones||[]),{id:'m-'+Date.now(),title,done:false}];await updateItem(user.uid,'goals',goal.id,{milestones});setMilestoneDraft({...milestoneDraft,[goal.id]:''});}} className="rounded-xl bg-amber-300 px-3 py-2 text-xs font-black text-[#091a35]">Add milestone</button></div></div>}
     </article>})}</div>}
    </section>
 
