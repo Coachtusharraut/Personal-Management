@@ -54,11 +54,11 @@ export default function DashboardView({
   const dailyQuests = missionState?.dailyQuests || INITIAL_DAILY_QUESTS;
   const campaign = missionState?.campaign;
   const userLevel = missionState?.userLevel || {
-    level: 4,
-    title: 'Mission Vanguard',
-    currentXp: 3450,
-    nextLevelXp: 5000,
-    streakDays: 14
+    level: 1,
+    title: 'Novice Warrior',
+    currentXp: 0,
+    nextLevelXp: 500,
+    streakDays: 0
   };
 
   // Segregate quests
