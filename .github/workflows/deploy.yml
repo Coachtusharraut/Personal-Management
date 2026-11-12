@@ -1,4 +1,4 @@
-name: Deploy LifeOS to Firebase Hosting
+name: "Deploy LifeOS to Firebase Hosting"
 
 on:
   push:
@@ -6,36 +6,35 @@ on:
       - tushar-lifeos
   workflow_dispatch:
 
-# Concurrency control to avoid parallel deployments overlapping
 concurrency:
-  group: hosting-deploy-${{ github.ref }}
+  group: "hosting-deploy-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
   build_and_deploy:
-    name: Build & Deploy to Production (tusharraut)
+    name: "Build and Deploy to Production"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: "Checkout Repository"
         uses: actions/checkout@v4
 
-      - name: Setup Node.js (v20 LTS)
+      - name: "Setup Node.js (v20 LTS)"
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
-      - name: Install Dependencies
+      - name: "Install Dependencies"
         run: npm ci
 
-      - name: Build Web Application
+      - name: "Build Web Application"
         run: npm run build
 
-      - name: Deploy to Firebase Hosting (Site: tusharraut)
+      - name: "Deploy to Firebase Hosting Site tusharraut"
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERSONAL_MGMT_APP || secrets.FIREBASE_SERVICE_ACCOUNT }}
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERSONAL_MGMT_APP || secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: personal-mgmt-app
           target: tusharraut
