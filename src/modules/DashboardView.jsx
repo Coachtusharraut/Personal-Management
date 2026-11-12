@@ -1,97 +1,67 @@
-import React, { useMemo, useState } from 'react';
-import confetti from 'canvas-confetti';
-import { Check, Plus, ArrowRight, Clock, Circle } from 'lucide-react';
-import { INITIAL_DAILY_QUESTS } from '../firebase/missionService';
+import React, { useMemo } from 'react';
+import { ArrowRight, Plus, Users, MessageCircle, CalendarCheck, TrendingUp, Target, Sparkles } from 'lucide-react';
 
-const MASCOT='https://coachtusharraut.com/wp-content/uploads/2026/11/lifeos-adventurer-mascot-200x300.png';
-const tile=[['career','🎯','Goals','Your next summit'],['calendar','🗓️','Plan','Own your time'],['story_forge','📖','Story Forge','Find your voice'],['opportunities','🚀','Opportunities','Find your next door']];
-const todayKey=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date());
+const EAGLE_ART=(
+<svg viewBox="0 0 320 180" className="w-full h-full" role="img" aria-label="Golden eagle with wings spread">
+ <defs><linearGradient id="egWing" x1="0" x2="1" y1="0" y2="1"><stop stopColor="#fff1b9"/><stop offset=".48" stopColor="#e8b750"/><stop offset="1" stopColor="#96531b"/></linearGradient><linearGradient id="egBody" x1="0" x2="1"><stop stopColor="#fff7d6"/><stop offset=".7" stopColor="#d99b43"/><stop offset="1" stopColor="#7b431b"/></linearGradient><filter id="egGlow"><feGaussianBlur stdDeviation="4"/></filter></defs>
+ <ellipse cx="160" cy="95" rx="126" ry="52" fill="#efb64a" opacity=".12" filter="url(#egGlow)"/>
+ <path d="M151 70C117 39 74 26 12 48c27 2 45 12 58 28-25-8-47-6-66 7 37 1 59 14 76 29-21-2-38 5-49 17 37-3 72 1 105 24l24-23 24 23c33-23 68-27 105-24-11-12-28-19-49-17 17-15 39-28 76-29-19-13-41-15-66-7 13-16 31-26 58-28-62-22-105-9-139 22Z" fill="url(#egWing)" stroke="#ffe6a4" strokeWidth="2.3" strokeLinejoin="round"/>
+ <g fill="#7f4b22" opacity=".58"><path d="M145 77 30 54l90 40-75-9 89 29-53-1 73 23-20-43Z"/><path d="m175 77 115-23-90 40 75-9-89 29 53-1-73 23 20-43Z"/></g>
+ <path d="M135 62c7-22 44-29 57 1l-6 56-27 26-27-26Z" fill="url(#egBody)" stroke="#fff0bd" strokeWidth="2"/>
+ <path d="M142 68c7-13 21-19 34-12l-6 26-25 2Z" fill="#fff8dd"/>
+ <path d="M158 50c15-18 36-10 39 6-6 17-20 23-34 19l-12-10Z" fill="#fff6d5"/>
+ <path d="m186 65 25 8-20 13-10-10Z" fill="#e9a832" stroke="#ffe8a0" strokeWidth="1.5"/>
+ <path d="m205 72 7 4-8 4Z" fill="#442515"/>
+ <circle cx="179" cy="61" r="3.5" fill="#261a12"/><circle cx="180" cy="60" r="1" fill="#fff"/>
+ <path d="M149 129 142 155l16-13 2-13 8 13 14 13-6-26Z" fill="#85501f" stroke="#f9db8f" strokeWidth="1.5"/>
+ <path d="m150 143-11 11 12-2 8-7 8 7 12 2-11-11" fill="#d39a3e"/>
+</svg>);
 
-export default function DashboardView({missionState,onSaveMissionState,tasks=[],habits=[],onNavigate}){
- const [showQuestInput,setShowQuestInput]=useState(false);
- const [questTitle,setQuestTitle]=useState('');
- const quests=missionState?.dailyQuests||INITIAL_DAILY_QUESTS;
- const today=todayKey();
- const todayQuests=quests.filter(q=>(!q.dueDate||q.dueDate===today));
- const topQuests=todayQuests.filter(q=>q.tier==='top3').slice(0,3);
- const done=todayQuests.filter(q=>q.completed).length;
- const total=todayQuests.length;
- const level=missionState?.userLevel||{level:1,title:'New Explorer',totalXp:0,currentXp:0,nextLevelXp:500,streakDays:0};
- const totalXp=level.totalXp??level.currentXp??0;
- const habitDone=habits.filter(h=>h.history?.[today]).length;
- const pendingTasks=tasks.filter(t=>t.status!=='done').length;
- const greeting=useMemo(()=>{
-  const h=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',hourCycle:'h23'}).format(new Date()));
-  return h<12?'Good morning':h<17?'Good afternoon':'Good evening';
- },[]);
- const dateLabel=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',weekday:'long',day:'numeric',month:'short'}).format(new Date());
+export default function DashboardView({teams=[],ibos=[],prospects=[],activities=[],onNavigate,onOpenQuickAdd}){
+ const core=ibos.filter(x=>x.meetingAttended&&x.bookingMade&&x.businessActive);
+ const totalTalks=activities.filter(x=>x.type==='conversation').reduce((n,x)=>n+(Number(x.quantity)||1),0);
+ const qualified=teams.filter(t=>Number(t.percentage||0)>=3).length;
+ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date());
+ const todayActivity=activities.filter(a=>(a.date||'')===today);
+ const counts=useMemo(()=>[
+  {label:'People spoken to',value:totalTalks,icon:MessageCircle,tab:'people',color:'gold'},
+  {label:'Meetings booked',value:todayActivity.filter(a=>a.type==='meeting_booked').reduce((n,a)=>n+(Number(a.quantity)||1),0),icon:CalendarCheck,tab:'activity',color:'blue'},
+  {label:'Core IBOs',value:core.length+'/60',icon:Users,tab:'teams',color:'green'}
+ ],[totalTalks,todayActivity,core.length]);
+ const teamCores=teams.map(t=>({team:t,count:core.filter(x=>x.teamId===t.id).length})).sort((a,b)=>(a.team.index||0)-(b.team.index||0));
+ const greeting=new Date().getHours()<12?'Good morning':new Date().getHours()<17?'Good afternoon':'Good evening';
+ const openPeople=prospects.filter(p=>!['converted','parked'].includes(p.stage)).length;
 
- const toggleQuest=(id)=>{
-  const target=quests.find(q=>q.id===id);if(!target)return;
-  const complete=!target.completed;
-  const updated=quests.map(q=>q.id===id?{...q,completed:complete,status:complete?'done':'todo',completedAt:complete?new Date().toISOString():null}:q);
-  const delta=complete?(target.xp||50):-(target.xp||50);
-  const newTotal=Math.max(0,totalXp+delta);
-  const newLevel=Math.floor(newTotal/500)+1;
-  const titles=['New Explorer','Steady Builder','Brave Pathfinder','Dharma Warrior','Champion','Legacy Maker','Master Explorer'];
-  const yesterday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date(Date.now()-86400000));
-  const last=level.lastQuestDate||'';
-  const streak=complete?(last===today?(level.streakDays||0):last===yesterday?(level.streakDays||0)+1:1):(level.streakDays||0);
-  onSaveMissionState({dailyQuests:updated,userLevel:{...level,totalXp:newTotal,level:newLevel,title:titles[Math.min(newLevel-1,titles.length-1)],currentXp:newTotal-((newLevel-1)*500),nextLevelXp:500,streakDays:streak,lastQuestDate:complete?today:last}});
-  if(complete)confetti({particleCount:35,spread:55,origin:{y:.75}});
- };
- const addQuest=(e)=>{
-  e.preventDefault();const title=questTitle.trim();if(!title)return;
-  const item={id:'quest-'+Date.now(),title,description:'One small step forward.',category:'Personal Growth',tier:'top3',priority:'high',durationMins:20,xp:75,dueDate:today,status:'todo',completed:false};
-  onSaveMissionState({dailyQuests:[item,...quests]});setQuestTitle('');setShowQuestInput(false);
- };
+ return <div className="eagle-home space-y-4">
+  <section className="eagle-hero">
+   <div className="eagle-hero-top"><div><p className="eagle-kicker">{greeting}, Eagle Builder 🪶</p><h1>Let's build<br/><span>your Eagle.</span></h1><p className="eagle-sub">One conversation at a time.</p></div><div className="eagle-art">{EAGLE_ART}</div></div>
+   <div className="eagle-mission-strip"><span>🎯</span><div><b>THE EAGLE STRUCTURE</b><small>6 teams · 10 Core IBOs each · 3%+ per leg</small></div><button onClick={()=>onNavigate('progress')} aria-label="View structure"><ArrowRight size={19}/></button></div>
+  </section>
 
- return <div className="lifeos-home space-y-5 sm:space-y-7 animate-fadeIn">
-  <section className="lifeos-hero relative overflow-hidden rounded-[28px] border border-amber-300/20 p-4 sm:p-7">
-   <div className="relative z-10 flex items-center gap-2">
-    <div className="min-w-0 flex-1">
-     <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[.18em] text-amber-200/80">{greeting}, Tushar 👋</p>
-     <h1 className="mt-1 text-[26px] sm:text-4xl font-black leading-tight text-white">Ready for a<br className="sm:hidden"/> little progress?</h1>
-     <p className="mt-2 text-[11px] sm:text-sm text-slate-300">{dateLabel} · Level {level.level||1} explorer</p>
-     <div className="mt-4 max-w-[240px]">
-      <div className="flex items-center justify-between text-[10px] font-bold text-amber-100"><span>{totalXp.toLocaleString('en-IN')} XP</span><span>{Math.max(0,500-(level.currentXp||0))} XP to level up</span></div>
-      <div className="mt-1.5 h-2 rounded-full bg-black/30 overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-orange-400" style={{width:Math.min(100,((level.currentXp||0)/500)*100)+'%'}}/></div>
-     </div>
-    </div>
-    <div className="lifeos-mascot-wrap shrink-0">
-     <img src={MASCOT} alt="Your LifeOS adventure guide" className="lifeos-mascot" loading="eager"/>
-     <span className="lifeos-mascot-spark">✨</span>
-    </div>
-   </div>
-   <div className="relative z-10 mt-4 flex items-center gap-2">
-    <span className="rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold text-amber-50">🔥 {level.streakDays||0} day streak</span>
-    <span className="rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold text-amber-50">🏆 {level.title||'New Explorer'}</span>
+  <section className="eagle-main-progress" onClick={()=>onNavigate('progress')} role="button" tabIndex={0} onKeyDown={e=>e.key==='Enter'&&onNavigate('progress')}>
+   <div className="flex items-center justify-between gap-2"><div><p className="eagle-mini-label">YOUR EAGLE NETWORK</p><div className="eagle-big-number">{core.length}<span> / 60 Core IBOs</span></div></div><div className="eagle-ring" style={{'--progress':(Math.min(100,core.length/60*100))+'%'}}><div><b>{Math.round(core.length/60*100)}%</b><small>built</small></div></div></div>
+   <div className="eagle-progress-track"><div style={{width:Math.min(100,core.length/60*100)+'%'}}/></div>
+   <div className="eagle-progress-foot"><span>{qualified}/6 legs at 3%+</span><span>{Math.max(0,60-core.length)} to go</span></div>
+  </section>
+
+  <section className="grid grid-cols-3 gap-2">
+   {counts.map(({label,value,icon:Icon,tab,color})=><button key={label} onClick={()=>onNavigate(tab)} className={'eagle-metric '+color}><Icon size={19}/><b>{value}</b><small>{label}</small></button>)}
+  </section>
+
+  <section className="space-y-2">
+   <div className="eagle-section-heading"><div><p>THE SIX WINGS</p><h2>Your 6 teams</h2></div><button onClick={()=>onNavigate('teams')}>View all <ArrowRight size={14}/></button></div>
+   <div className="eagle-six-grid">
+    {teamCores.map(({team,count},i)=><button key={team.id} onClick={()=>onNavigate('teams',team.id)} className={'eagle-team-chip team-'+(i+1)}>
+      <span className="eagle-team-bird">🦅</span><span className="eagle-team-name">{team.name||'Team '+(i+1)}</span><b>{count}/10</b><span className={'eagle-percent '+(Number(team.percentage)>=3?'qualified':'')}>{Number(team.percentage||0).toFixed(1)}% {Number(team.percentage)>=3?'✓':'/ 3%'}</span>
+     </button>)}
    </div>
   </section>
 
-  <section className="grid grid-cols-3 gap-2.5 sm:gap-4">
-   <button onClick={()=>onNavigate('tasks')} className="lifeos-stat-card"><span className="lifeos-stat-icon">✅</span><span className="lifeos-stat-value">{done}/{total}</span><span className="lifeos-stat-label">Quests done</span></button>
-   <button onClick={()=>onNavigate('habits')} className="lifeos-stat-card"><span className="lifeos-stat-icon">🌱</span><span className="lifeos-stat-value">{habitDone}/{habits.length}</span><span className="lifeos-stat-label">Habits today</span></button>
-   <button onClick={()=>onNavigate('tasks')} className="lifeos-stat-card"><span className="lifeos-stat-icon">📌</span><span className="lifeos-stat-value">{pendingTasks}</span><span className="lifeos-stat-label">To do</span></button>
+  <section className="grid grid-cols-2 gap-2.5">
+   <button onClick={()=>onNavigate('people')} className="eagle-action-card"><span className="eagle-action-art">🗣️</span><b>Talk to more people</b><small>{openPeople} in your pipeline</small><ArrowRight size={15}/></button>
+   <button onClick={()=>onNavigate('activity')} className="eagle-action-card"><span className="eagle-action-art">📅</span><b>Log today's actions</b><small>{todayActivity.length} activities today</small><ArrowRight size={15}/></button>
   </section>
 
-  <section className="space-y-3">
-   <div className="flex items-end justify-between gap-2">
-    <div><p className="text-[10px] font-bold uppercase tracking-[.16em] text-amber-300">Today's adventure</p><h2 className="mt-1 text-lg sm:text-xl font-black text-white">Your Big Three ⚡</h2></div>
-    <button onClick={()=>setShowQuestInput(v=>!v)} className="flex min-h-10 items-center gap-1.5 rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-[11px] font-extrabold text-amber-200"><Plus size={15}/> Add</button>
-   </div>
-   {showQuestInput&&<form onSubmit={addQuest} className="flex gap-2 rounded-2xl border border-amber-300/20 bg-[#101b2c] p-3"><input autoFocus value={questTitle} onChange={e=>setQuestTitle(e.target.value)} placeholder="What is your next small win?" className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-xs text-white"/><button className="rounded-xl bg-amber-300 px-3 text-xs font-black text-[#091a35]">Save</button></form>}
-   {topQuests.length===0?<div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 p-5 text-center"><span className="text-3xl">🧭</span><p className="mt-2 text-sm font-bold text-white">Your day is wide open!</p><p className="mt-1 text-xs text-slate-400">Add one small win and get moving.</p><button onClick={()=>setShowQuestInput(true)} className="mt-3 rounded-xl bg-amber-300 px-4 py-2 text-xs font-black text-[#091a35]">Create first quest</button></div>:
-    <div className="space-y-2.5">{topQuests.map((q,i)=><button key={q.id} onClick={()=>toggleQuest(q.id)} className={'lifeos-quest-card '+(q.completed?'is-done':'')}><span className="lifeos-quest-number">{['1','2','3'][i]}</span><span className="min-w-0 flex-1 text-left"><span className={'block text-[12px] sm:text-sm font-bold leading-snug '+(q.completed?'line-through text-slate-500':'text-white')}>{q.title}</span><span className="mt-1 flex items-center gap-2 text-[10px] text-slate-400"><span>{q.category||'Personal'}</span><span>·</span><span><Clock size={10} className="inline"/> {q.durationMins||20} min</span><span>·</span><span className="text-amber-300">+{q.xp||50} XP</span></span></span><span className={'lifeos-quest-check '+(q.completed?'checked':'')}>{q.completed?<Check size={17}/>:<Circle size={19}/>}</span></button>)}</div>}
-  </section>
-
-  <section className="space-y-3">
-   <div><p className="text-[10px] font-bold uppercase tracking-[.16em] text-amber-300">Your world</p><h2 className="mt-1 text-lg sm:text-xl font-black text-white">Where to next? 🚀</h2></div>
-   <div className="grid grid-cols-2 gap-2.5 sm:gap-3">{tile.map(([tab,emoji,title,sub])=><button key={tab} onClick={()=>onNavigate(tab)} className="lifeos-launch-card"><span className="text-2xl sm:text-3xl">{emoji}</span><span className="mt-2 block text-sm font-extrabold text-white">{title}</span><span className="mt-0.5 block text-[10px] text-slate-400">{sub}</span><ArrowRight size={15} className="mt-2 text-amber-300"/></button>)}</div>
-  </section>
-
-  <section className="lifeos-cheer flex items-center gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-300/5 p-3.5">
-   <span className="text-2xl">🌟</span><p className="text-xs leading-relaxed text-slate-300"><strong className="text-emerald-200">A little reminder:</strong> You don't need a perfect day. Just one honest step.</p>
-  </section>
+  <section className="eagle-quote"><span>🪶</span><p><b>Fly high. Build wide. Build deep.</b><small>Every strong wing starts with one person who grows.</small></p><button onClick={()=>onNavigate('wisdom')} aria-label="Eagle wisdom"><ArrowRight size={17}/></button></section>
  </div>;
 }
