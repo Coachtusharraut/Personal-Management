@@ -38,12 +38,17 @@ import {
   Sword, 
   Layers, 
   Timer,
-  CheckSquare
+  CheckSquare,
+  Home,
+  ListChecks,
+  MoreHorizontal,
+  X
 } from 'lucide-react';
 
 export default function App() {
   const { user, loading, isGuest } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
@@ -146,12 +151,19 @@ export default function App() {
   const todayStr = new Date().toISOString().split('T')[0];
   const pendingTasks = tasks.filter(t => t.status !== 'done').length;
   const pendingHabitsToday = habits.filter(h => !h.history || !h.history[todayStr]).length;
+  const mobileTabs = [
+    { id: 'dashboard', label: 'Home', icon: Home },
+    { id: 'tasks', label: 'Quests', icon: ListChecks },
+    { id: 'habits', label: 'Habits', icon: Sparkles },
+    { id: 'story_forge', label: 'Story', icon: BookOpen }
+  ];
+  const moreItems = NAV_ITEMS.filter(item => !['dashboard','tasks','habits','story_forge'].includes(item.id));
 
   if (loading) return <div className="min-h-screen bg-[#070b14] text-slate-200 grid place-items-center"><div className="text-center"><div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-2 border-amber-300/20 border-t-amber-300"/><p className="text-sm font-bold">Securing your LifeOS…</p></div></div>;
   if (!user || isGuest) return <AuthGate />;
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200 relative">
+    <div className="min-h-[100dvh] bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200 relative">
       {/* Top Command Navbar */}
       <Navbar 
         onOpenQuickAdd={() => setIsQuickAddOpen(true)}
@@ -170,7 +182,7 @@ export default function App() {
         />
 
         {/* Dynamic Module Container */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto pb-32 md:pb-12 min-w-0">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 overflow-y-auto pb-[calc(108px+env(safe-area-inset-bottom))] md:pb-12 min-w-0">
           {activeTab === 'dashboard' && (
             <DashboardView 
               missionState={missionState}
@@ -253,32 +265,44 @@ export default function App() {
         </main>
       </div>
 
-      {/* Floating Action Button: ASK MY MISSION AI */}
-      <div className="fixed bottom-20 md:bottom-6 right-5 z-40">
-        <button
-          onClick={() => setIsAiChatOpen(true)}
-          className="group relative flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-amber-300"
-        >
-          <span className="w-2.5 h-2.5 rounded-full bg-slate-950 animate-ping absolute top-1 right-1" />
-          <Bot className="w-5 h-5 stroke-[2.5] text-slate-950 animate-bounce" />
-          <span className="tracking-tight">ASK MY MISSION AI</span>
+      {/* Desktop mission assistant */}
+      <div className="hidden md:block fixed bottom-6 right-5 z-40">
+        <button onClick={() => setIsAiChatOpen(true)} className="flex items-center gap-2.5 rounded-full border-2 border-amber-300 bg-gradient-to-r from-amber-400 to-yellow-300 px-5 py-3 text-sm font-black text-slate-950 shadow-xl shadow-amber-500/20 transition hover:scale-105">
+          <Bot className="h-5 w-5"/> My LifeOS Guide
         </button>
       </div>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b14]/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-2 flex items-center gap-1 overflow-x-auto">
-        {NAV_ITEMS.map((item) => {
+      {/* Mobile app navigation: four main destinations + one roomy More menu */}
+      <nav className="lifeos-bottom-nav md:hidden" aria-label="Main app navigation">
+        {mobileTabs.map(item => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button key={item.id} onClick={() => setActiveTab(item.id)} aria-label={item.label}
-              className={`min-w-[62px] flex-shrink-0 flex flex-col items-center justify-center px-1.5 py-1.5 rounded-xl text-[9px] font-bold transition ${isActive ? 'text-amber-300 bg-amber-300/10' : 'text-slate-500 hover:text-slate-200'}`}>
-              <Icon className="w-4 h-4 mb-0.5" />
-              <span className="max-w-[70px] truncate">{item.label}</span>
-            </button>
-          );
+          const active = activeTab === item.id;
+          return <button key={item.id} onClick={() => {setActiveTab(item.id);setShowMoreMenu(false);}} className={'lifeos-tab '+(active?'active':'')} aria-current={active?'page':undefined}>
+            <Icon size={22} strokeWidth={active?2.6:2.1}/><span>{item.label}</span>
+          </button>;
         })}
+        <button onClick={() => setShowMoreMenu(v=>!v)} className={'lifeos-tab '+(showMoreMenu||moreItems.some(x=>x.id===activeTab)?'active':'')} aria-expanded={showMoreMenu}>
+          {showMoreMenu?<X size={22}/>:<MoreHorizontal size={22}/>}<span>More</span>
+        </button>
       </nav>
+
+      {showMoreMenu && <div className="lifeos-more-overlay md:hidden" onClick={()=>setShowMoreMenu(false)}>
+        <section className="lifeos-more-sheet" role="dialog" aria-modal="true" aria-label="More LifeOS sections" onClick={e=>e.stopPropagation()}>
+          <div className="lifeos-sheet-handle"/>
+          <div className="flex items-center justify-between px-1 pb-3">
+            <div><p className="text-[10px] uppercase font-bold tracking-[.16em] text-amber-300">Explore LifeOS</p><h2 className="text-lg font-black text-white">More of your world ✨</h2></div>
+            <button onClick={()=>setShowMoreMenu(false)} className="grid h-10 w-10 place-items-center rounded-full bg-slate-800 text-slate-200" aria-label="Close menu"><X size={19}/></button>
+          </div>
+          <div className="lifeos-more-grid">
+            {moreItems.map(item=>{const Icon=item.icon;return <button key={item.id} onClick={()=>{setActiveTab(item.id);setShowMoreMenu(false);}} className="lifeos-more-item">
+              <span className="lifeos-more-icon"><Icon size={21}/></span><span className="min-w-0 text-left"><span className="block text-[12px] font-bold text-white">{item.label}</span><span className="mt-0.5 block text-[9px] text-slate-500">{item.badge||'Open'}</span></span>
+            </button>;})}
+            <button onClick={()=>{setIsAiChatOpen(true);setShowMoreMenu(false);}} className="lifeos-more-item">
+              <span className="lifeos-more-icon text-amber-200"><Bot size={21}/></span><span className="text-left"><span className="block text-[12px] font-bold text-white">LifeOS Guide</span><span className="mt-0.5 block text-[9px] text-slate-500">Talk it through</span></span>
+            </button>
+          </div>
+        </section>
+      </div>
 
       {/* Quick Add Universal Modal */}
       <QuickAddModal 
