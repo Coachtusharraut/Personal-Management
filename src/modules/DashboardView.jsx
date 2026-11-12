@@ -1,646 +1,97 @@
-import React, { useState } from 'react';
-import { 
-  Flame, 
-  Target, 
-  Sparkles, 
-  CheckCircle2, 
-  Circle, 
-  Clock, 
-  Calendar, 
-  Plus, 
-  Award, 
-  TrendingUp, 
-  ArrowUpRight, 
-  BookOpen, 
-  Heart, 
-  Brain, 
-  MessageSquare,
-  ShieldCheck,
-  ChevronRight,
-  Smile,
-  Zap,
-  Coffee,
-  Sun,
-  Moon
-} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { INITIAL_DAILY_QUESTS, INITIAL_EVENING_REFLECTION } from '../firebase/missionService';
+import { Check, Plus, ArrowRight, Clock, Circle } from 'lucide-react';
+import { INITIAL_DAILY_QUESTS } from '../firebase/missionService';
 
-export default function DashboardView({ 
-  missionState, 
-  onSaveMissionState,
-  tasks = [], 
-  habits = [], 
-  expenses = [], 
-  goals = [], 
-  onNavigate,
-  onOpenQuickAdd 
-}) {
-  const [reflectionInput, setReflectionInput] = useState(
-    missionState?.eveningReflection || INITIAL_EVENING_REFLECTION
-  );
-  const [isReflectionSaved, setIsReflectionSaved] = useState(false);
-  const [showAddQuestModal, setShowAddQuestModal] = useState(false);
-  const [newQuest, setNewQuest] = useState({
-    title: '',
-    description: '',
-    category: 'Business Development',
-    tier: 'top3',
-    priority: 'high',
-    durationMins: 30,
-    xp: 100
-  });
+const MASCOT='https://coachtusharraut.com/wp-content/uploads/2026/11/lifeos-adventurer-mascot-200x300.png';
+const tile=[['career','🎯','Goals','Your next summit'],['calendar','🗓️','Plan','Own your time'],['story_forge','📖','Story Forge','Find your voice'],['opportunities','🚀','Opportunities','Find your next door']];
+const todayKey=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date());
 
-  const dailyQuests = missionState?.dailyQuests || INITIAL_DAILY_QUESTS;
-  const campaign = missionState?.campaign;
-  const userLevel = missionState?.userLevel || {
-    level: 1,
-    title: 'Novice Warrior',
-    currentXp: 0,
-    nextLevelXp: 500,
-    streakDays: 0
-  };
+export default function DashboardView({missionState,onSaveMissionState,tasks=[],habits=[],onNavigate}){
+ const [showQuestInput,setShowQuestInput]=useState(false);
+ const [questTitle,setQuestTitle]=useState('');
+ const quests=missionState?.dailyQuests||INITIAL_DAILY_QUESTS;
+ const today=todayKey();
+ const todayQuests=quests.filter(q=>(!q.dueDate||q.dueDate===today));
+ const topQuests=todayQuests.filter(q=>q.tier==='top3').slice(0,3);
+ const done=todayQuests.filter(q=>q.completed).length;
+ const total=todayQuests.length;
+ const level=missionState?.userLevel||{level:1,title:'New Explorer',totalXp:0,currentXp:0,nextLevelXp:500,streakDays:0};
+ const totalXp=level.totalXp??level.currentXp??0;
+ const habitDone=habits.filter(h=>h.history?.[today]).length;
+ const pendingTasks=tasks.filter(t=>t.status!=='done').length;
+ const greeting=useMemo(()=>{
+  const h=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',hourCycle:'h23'}).format(new Date()));
+  return h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+ },[]);
+ const dateLabel=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',weekday:'long',day:'numeric',month:'short'}).format(new Date());
 
-  // Segregate quests
-  const top3Quests = dailyQuests.filter(q => q.tier === 'top3');
-  const supportingQuests = dailyQuests.filter(q => q.tier === 'supporting');
-  const growthChallenges = dailyQuests.filter(q => q.tier === 'growth_challenge');
+ const toggleQuest=(id)=>{
+  const target=quests.find(q=>q.id===id);if(!target)return;
+  const complete=!target.completed;
+  const updated=quests.map(q=>q.id===id?{...q,completed:complete,status:complete?'done':'todo',completedAt:complete?new Date().toISOString():null}:q);
+  const delta=complete?(target.xp||50):-(target.xp||50);
+  const newTotal=Math.max(0,totalXp+delta);
+  const newLevel=Math.floor(newTotal/500)+1;
+  const titles=['New Explorer','Steady Builder','Brave Pathfinder','Dharma Warrior','Champion','Legacy Maker','Master Explorer'];
+  const yesterday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date(Date.now()-86400000));
+  const last=level.lastQuestDate||'';
+  const streak=complete?(last===today?(level.streakDays||0):last===yesterday?(level.streakDays||0)+1:1):(level.streakDays||0);
+  onSaveMissionState({dailyQuests:updated,userLevel:{...level,totalXp:newTotal,level:newLevel,title:titles[Math.min(newLevel-1,titles.length-1)],currentXp:newTotal-((newLevel-1)*500),nextLevelXp:500,streakDays:streak,lastQuestDate:complete?today:last}});
+  if(complete)confetti({particleCount:35,spread:55,origin:{y:.75}});
+ };
+ const addQuest=(e)=>{
+  e.preventDefault();const title=questTitle.trim();if(!title)return;
+  const item={id:'quest-'+Date.now(),title,description:'One small step forward.',category:'Personal Growth',tier:'top3',priority:'high',durationMins:20,xp:75,dueDate:today,status:'todo',completed:false};
+  onSaveMissionState({dailyQuests:[item,...quests]});setQuestTitle('');setShowQuestInput(false);
+ };
 
-  const completedCount = dailyQuests.filter(q => q.completed).length;
-  const totalCount = dailyQuests.length;
-  const completionPercentage = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
-
-  // Handle completing a quest
-  const handleToggleQuest = (questId) => {
-    const targetQuest = dailyQuests.find(q => q.id === questId);
-    const willBeCompleted = !targetQuest?.completed;
-
-    const updatedQuests = dailyQuests.map(q => {
-      if (q.id === questId) {
-        return {
-          ...q,
-          completed: willBeCompleted,
-          status: willBeCompleted ? 'done' : 'todo',
-          completedAt: willBeCompleted ? new Date().toISOString() : null
-        };
-      }
-      return q;
-    });
-
-    // Award genuine XP, track lifetime XP for story unlocks, and roll rank progress forward.
-    const xpDelta = willBeCompleted ? (targetQuest?.xp || 50) : -(targetQuest?.xp || 50);
-    const totalXp = Math.max(0, (userLevel.totalXp ?? userLevel.currentXp ?? 0) + xpDelta);
-    const level = Math.floor(totalXp / 500) + 1;
-    const levelStartXp = (level - 1) * 500;
-    const levelTitles = ['Novice Warrior','Disciplined Archer','Pathfinder','Dharma Vanguard','Champion','Legacy Builder','Master of the Path'];
-    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
-    const yesterdayDate = new Date(Date.now() - 86400000);
-    const yesterday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(yesterdayDate);
-    const lastQuestDate = userLevel.lastQuestDate || '';
-    const streakDays = willBeCompleted
-      ? (lastQuestDate === today ? (userLevel.streakDays || 0) : lastQuestDate === yesterday ? (userLevel.streakDays || 0) + 1 : 1)
-      : (userLevel.streakDays || 0);
-    const updatedLevel = {
-      ...userLevel,
-      totalXp,
-      level,
-      title: levelTitles[Math.min(level - 1, levelTitles.length - 1)],
-      currentXp: totalXp - levelStartXp,
-      nextLevelXp: 500,
-      streakDays,
-      lastQuestDate: willBeCompleted ? today : lastQuestDate
-    };
-
-    if (willBeCompleted) {
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.7 }
-      });
-    }
-
-    onSaveMissionState({
-      dailyQuests: updatedQuests,
-      userLevel: updatedLevel
-    });
-  };
-
-  // Add new custom quest
-  const handleCreateQuest = (e) => {
-    e.preventDefault();
-    if (!newQuest.title.trim()) return;
-
-    const questToAdd = {
-      id: `quest-${Date.now()}`,
-      ...newQuest,
-      dueDate: new Date().toISOString().split('T')[0],
-      status: 'todo',
-      completed: false
-    };
-
-    const updated = [questToAdd, ...dailyQuests];
-    onSaveMissionState({ dailyQuests: updated });
-    setShowAddQuestModal(false);
-    setNewQuest({
-      title: '',
-      description: '',
-      category: 'Business Development',
-      tier: 'supporting',
-      priority: 'high',
-      durationMins: 30,
-      xp: 100
-    });
-  };
-
-  // Save evening reflection
-  const handleSaveReflection = (e) => {
-    e.preventDefault();
-    onSaveMissionState({ eveningReflection: reflectionInput });
-    setIsReflectionSaved(true);
-    setTimeout(() => setIsReflectionSaved(false), 3000);
-  };
-
-  return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* 1. Heroic Command Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c1527] via-[#070b14] to-[#161a2e] border border-amber-500/30 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-        
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Left: Mission & Campaign Context */}
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
-                <Target className="w-3.5 h-3.5" />
-                Primary Life Mission: Obesity-Free India
-              </span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
-                Platform: ReshapeNation
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#fdfbf7] tracking-tight">
-              Daily Mission Board
-            </h1>
-            
-            <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Every quest accomplished today is a tangible brick in the <span className="text-amber-300 font-semibold">Obesity-Free India</span> movement. Zero arbitrary busywork—only decisive, measurable forward momentum.
-            </p>
-
-            {/* Campaign Callout */}
-            {campaign && (
-              <div 
-                onClick={() => onNavigate('campaign')}
-                className="inline-flex items-center gap-3 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 hover:border-amber-400 cursor-pointer transition text-xs"
-              >
-                <Flame className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                <span className="text-amber-200 font-semibold truncate">
-                  Active Challenge: <span className="font-bold text-[#fdfbf7]">{campaign.name}</span>
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
-                  ₹{(campaign.financials?.collected || 0).toLocaleString('en-IN')} Collected
-                </span>
-                <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
-              </div>
-            )}
-          </div>
-
-          {/* Right: XP & Gamification Level Card */}
-          <div className="p-5 rounded-3xl bg-[#090f1e]/90 border border-amber-500/30 lg:w-72 flex-shrink-0 space-y-3 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-xl bg-amber-500 text-slate-950">
-                  <Award className="w-4 h-4 stroke-[2.5]" />
-                </span>
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Level {userLevel.level}</span>
-                  <span className="text-xs font-black text-amber-300">{userLevel.title}</span>
-                </div>
-              </div>
-              <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 fill-emerald-400" />
-                {userLevel.streakDays}d Streak
-              </span>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-[11px] font-semibold text-slate-300">
-                <span>XP Progress</span>
-                <span className="text-amber-300">{userLevel.currentXp} / {userLevel.nextLevelXp} XP</span>
-              </div>
-              <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
-                <div 
-                  className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" 
-                  style={{ width: `${Math.min(100, Math.round((userLevel.currentXp / userLevel.nextLevelXp) * 100))}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Today's Completion</span>
-              <span className="font-bold text-[#fdfbf7]">{completedCount}/{totalCount} Quests ({completionPercentage}%)</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Morning Briefing Strip */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-slate-900/60 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
-        <div className="flex items-center gap-3">
-          <span className="p-2 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            <Sun className="w-4 h-4" />
-          </span>
-          <div>
-            <span className="font-bold text-[#fdfbf7] block">Morning Strategic Briefing</span>
-            <span className="text-slate-400">
-              Primary Objective: Drive 2 consultations and launch the Visceral Fat video for the ₹1L Campaign.
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 self-end md:self-center">
-          <button
-            onClick={() => setShowAddQuestModal(true)}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs transition shadow-md shadow-amber-500/20 flex items-center gap-1.5"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
-            Add Quest
-          </button>
-        </div>
-      </div>
-
-      {/* 3. The Core Three (Top 3 Priority Quests) */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300">
-              <Zap className="w-4 h-4" />
-            </span>
-            <h2 className="text-base font-extrabold text-[#fdfbf7] tracking-tight">
-              The Core Three: Highest-Leverage Quests
-            </h2>
-          </div>
-          <span className="text-xs text-amber-400 font-semibold">Priority Imperative</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {top3Quests.map((quest) => (
-            <div 
-              key={quest.id}
-              className={`p-5 rounded-3xl border transition flex flex-col justify-between space-y-4 shadow-xl relative overflow-hidden ${
-                quest.completed 
-                  ? 'bg-emerald-950/20 border-emerald-500/30' 
-                  : 'bg-[#090f1e] border-amber-500/40 hover:border-amber-400'
-              }`}
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                    quest.priority === 'urgent' ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'
-                  }`}>
-                    {quest.priority}
-                  </span>
-                  <span className="text-[11px] font-bold text-amber-400">+{quest.xp} XP</span>
-                </div>
-
-                <div>
-                  <h3 className={`text-sm font-bold leading-snug transition ${
-                    quest.completed ? 'line-through text-slate-400' : 'text-[#fdfbf7]'
-                  }`}>
-                    {quest.title}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                    {quest.description}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-400 pt-1">
-                  <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800">
-                    {quest.category}
-                  </span>
-                  {quest.durationMins && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-slate-500" />
-                      {quest.durationMins}m
-                    </span>
-                  )}
-                  {quest.startTime && (
-                    <span>{quest.startTime} - {quest.endTime}</span>
-                  )}
-                </div>
-              </div>
-
-              <button
-                onClick={() => handleToggleQuest(quest.id)}
-                className={`w-full py-2.5 rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 ${
-                  quest.completed 
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
-                    : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                }`}
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{quest.completed ? 'Completed' : 'Mark Quest Complete'}</span>
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 4. Two-Column Grid: Supporting Quests & Health Habits */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Supporting Quests */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-[#fdfbf7] flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-slate-400" />
-              Supporting Quests
-            </h2>
-            <span className="text-xs text-slate-400">{supportingQuests.length} tasks</span>
-          </div>
-
-          <div className="space-y-3">
-            {supportingQuests.map((quest) => (
-              <div 
-                key={quest.id}
-                className={`p-4 rounded-2xl border transition flex items-center justify-between gap-3 ${
-                  quest.completed 
-                    ? 'bg-slate-900/40 border-slate-800/80 text-slate-500' 
-                    : 'bg-[#090f1e] border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => handleToggleQuest(quest.id)}
-                    className="text-slate-400 hover:text-emerald-400 transition"
-                  >
-                    {quest.completed ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    ) : (
-                      <Circle className="w-5 h-5" />
-                    )}
-                  </button>
-                  <div>
-                    <h4 className={`text-xs font-bold ${quest.completed ? 'line-through text-slate-400' : 'text-slate-200'}`}>
-                      {quest.title}
-                    </h4>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-                      <span>{quest.category}</span>
-                      <span>•</span>
-                      <span>+{quest.xp} XP</span>
-                    </div>
-                  </div>
-                </div>
-
-                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                  quest.priority === 'high' ? 'bg-amber-500/10 text-amber-300' : 'bg-slate-800 text-slate-400'
-                }`}>
-                  {quest.priority}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Health & Personal Habits */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-[#fdfbf7] flex items-center gap-2">
-              <Heart className="w-4 h-4 text-emerald-400" />
-              Health & Vitality Rituals
-            </h2>
-            <button 
-              onClick={() => onNavigate('habits')}
-              className="text-xs text-amber-400 hover:text-amber-300 font-medium"
-            >
-              View All Habits
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {habits.slice(0, 4).map((habit) => {
-              const todayStr = new Date().toISOString().split('T')[0];
-              const isDoneToday = habit.history && habit.history[todayStr];
-
-              return (
-                <div 
-                  key={habit.id}
-                  className="p-4 rounded-2xl bg-[#090f1e] border border-slate-800 flex items-center justify-between gap-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-                      <Heart className="w-4 h-4" />
-                    </span>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-200">{habit.name}</h4>
-                      <p className="text-[10px] text-slate-400">{habit.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
-                      <Flame className="w-3.5 h-3.5 fill-amber-400" />
-                      {habit.streak || 0}d
-                    </span>
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-xl ${
-                      isDoneToday ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'
-                    }`}>
-                      {isDoneToday ? 'Logged' : 'Pending'}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* 5. Meaningful Personal-Growth Challenge */}
-      {growthChallenges.length > 0 && (
-        <div className="p-5 rounded-3xl bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-[#090f1e] border border-indigo-500/30 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-              <Brain className="w-3.5 h-3.5" />
-              Daily Personal-Growth Challenge
-            </span>
-            <span className="text-xs font-bold text-indigo-300">+{growthChallenges[0].xp} XP</span>
-          </div>
-          <h3 className="text-sm font-bold text-[#fdfbf7]">{growthChallenges[0].title}</h3>
-          <p className="text-xs text-slate-300 leading-relaxed">{growthChallenges[0].description}</p>
-        </div>
-      )}
-
-      {/* 6. Evening Reflection Section */}
-      <div className="p-6 rounded-3xl bg-[#090f1e] border border-slate-800 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
-              <Moon className="w-4 h-4" />
-            </span>
-            <div>
-              <h3 className="text-sm font-bold text-[#fdfbf7]">Evening Reflection & Closing Ritual</h3>
-              <p className="text-xs text-slate-400">What did I accomplish? What did I learn? What should happen tomorrow?</p>
-            </div>
-          </div>
-
-          {isReflectionSaved && (
-            <span className="text-xs font-bold text-emerald-400 animate-pulse">
-              Reflection Saved!
-            </span>
-          )}
-        </div>
-
-        <form onSubmit={handleSaveReflection} className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div>
-            <label className="block text-slate-400 font-semibold mb-1">What did I accomplish today?</label>
-            <textarea
-              rows={2}
-              value={reflectionInput.accomplished}
-              onChange={(e) => setReflectionInput({ ...reflectionInput, accomplished: e.target.value })}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-400 font-semibold mb-1">What did I learn today?</label>
-            <textarea
-              rows={2}
-              value={reflectionInput.learned}
-              onChange={(e) => setReflectionInput({ ...reflectionInput, learned: e.target.value })}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-400 font-semibold mb-1">What prevented or slowed progress?</label>
-            <textarea
-              rows={2}
-              value={reflectionInput.preventedProgress}
-              onChange={(e) => setReflectionInput({ ...reflectionInput, preventedProgress: e.target.value })}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-400 font-semibold mb-1">What should happen tomorrow?</label>
-            <textarea
-              rows={2}
-              value={reflectionInput.tomorrowPriorities}
-              onChange={(e) => setReflectionInput({ ...reflectionInput, tomorrowPriorities: e.target.value })}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200"
-            />
-          </div>
-
-          <div className="md:col-span-2 flex items-center justify-end">
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition shadow-lg shadow-amber-500/20"
-            >
-              Save Evening Reflection
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Add Custom Quest Modal */}
-      {showAddQuestModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#0c1527] border border-amber-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-[#fdfbf7]">Create Daily Mission Quest</h3>
-            
-            <form onSubmit={handleCreateQuest} className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-400 mb-1 font-semibold">Quest Title</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Outreach to 5 gym owners"
-                  value={newQuest.title}
-                  onChange={(e) => setNewQuest({ ...newQuest, title: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-400 mb-1 font-semibold">Description</label>
-                <textarea
-                  rows={2}
-                  value={newQuest.description}
-                  onChange={(e) => setNewQuest({ ...newQuest, description: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-semibold">Priority Tier</label>
-                  <select
-                    value={newQuest.tier}
-                    onChange={(e) => setNewQuest({ ...newQuest, tier: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200"
-                  >
-                    <option value="top3">The Core Three (Top 3)</option>
-                    <option value="supporting">Supporting Quest</option>
-                    <option value="growth_challenge">Personal Growth</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-400 mb-1 font-semibold">Category</label>
-                  <select
-                    value={newQuest.category}
-                    onChange={(e) => setNewQuest({ ...newQuest, category: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200"
-                  >
-                    <option value="Business Development">Business Development</option>
-                    <option value="Speaking & Influence">Speaking & Influence</option>
-                    <option value="Health & Fitness">Health & Fitness</option>
-                    <option value="Learning">Learning</option>
-                    <option value="Finance">Finance</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-semibold">Est. Duration (Mins)</label>
-                  <input
-                    type="number"
-                    value={newQuest.durationMins}
-                    onChange={(e) => setNewQuest({ ...newQuest, durationMins: Number(e.target.value) })}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-400 mb-1 font-semibold">XP Reward</label>
-                  <input
-                    type="number"
-                    value={newQuest.xp}
-                    onChange={(e) => setNewQuest({ ...newQuest, xp: Number(e.target.value) })}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setShowAddQuestModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold"
-                >
-                  Add Quest
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+ return <div className="lifeos-home space-y-5 sm:space-y-7 animate-fadeIn">
+  <section className="lifeos-hero relative overflow-hidden rounded-[28px] border border-amber-300/20 p-4 sm:p-7">
+   <div className="relative z-10 flex items-center gap-2">
+    <div className="min-w-0 flex-1">
+     <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[.18em] text-amber-200/80">{greeting}, Tushar 👋</p>
+     <h1 className="mt-1 text-[26px] sm:text-4xl font-black leading-tight text-white">Ready for a<br className="sm:hidden"/> little progress?</h1>
+     <p className="mt-2 text-[11px] sm:text-sm text-slate-300">{dateLabel} · Level {level.level||1} explorer</p>
+     <div className="mt-4 max-w-[240px]">
+      <div className="flex items-center justify-between text-[10px] font-bold text-amber-100"><span>{totalXp.toLocaleString('en-IN')} XP</span><span>{Math.max(0,500-(level.currentXp||0))} XP to level up</span></div>
+      <div className="mt-1.5 h-2 rounded-full bg-black/30 overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-orange-400" style={{width:Math.min(100,((level.currentXp||0)/500)*100)+'%'}}/></div>
+     </div>
     </div>
-  );
+    <div className="lifeos-mascot-wrap shrink-0">
+     <img src={MASCOT} alt="Your LifeOS adventure guide" className="lifeos-mascot" loading="eager"/>
+     <span className="lifeos-mascot-spark">✨</span>
+    </div>
+   </div>
+   <div className="relative z-10 mt-4 flex items-center gap-2">
+    <span className="rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold text-amber-50">🔥 {level.streakDays||0} day streak</span>
+    <span className="rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold text-amber-50">🏆 {level.title||'New Explorer'}</span>
+   </div>
+  </section>
+
+  <section className="grid grid-cols-3 gap-2.5 sm:gap-4">
+   <button onClick={()=>onNavigate('tasks')} className="lifeos-stat-card"><span className="lifeos-stat-icon">✅</span><span className="lifeos-stat-value">{done}/{total}</span><span className="lifeos-stat-label">Quests done</span></button>
+   <button onClick={()=>onNavigate('habits')} className="lifeos-stat-card"><span className="lifeos-stat-icon">🌱</span><span className="lifeos-stat-value">{habitDone}/{habits.length}</span><span className="lifeos-stat-label">Habits today</span></button>
+   <button onClick={()=>onNavigate('tasks')} className="lifeos-stat-card"><span className="lifeos-stat-icon">📌</span><span className="lifeos-stat-value">{pendingTasks}</span><span className="lifeos-stat-label">To do</span></button>
+  </section>
+
+  <section className="space-y-3">
+   <div className="flex items-end justify-between gap-2">
+    <div><p className="text-[10px] font-bold uppercase tracking-[.16em] text-amber-300">Today's adventure</p><h2 className="mt-1 text-lg sm:text-xl font-black text-white">Your Big Three ⚡</h2></div>
+    <button onClick={()=>setShowQuestInput(v=>!v)} className="flex min-h-10 items-center gap-1.5 rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-[11px] font-extrabold text-amber-200"><Plus size={15}/> Add</button>
+   </div>
+   {showQuestInput&&<form onSubmit={addQuest} className="flex gap-2 rounded-2xl border border-amber-300/20 bg-[#101b2c] p-3"><input autoFocus value={questTitle} onChange={e=>setQuestTitle(e.target.value)} placeholder="What is your next small win?" className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-xs text-white"/><button className="rounded-xl bg-amber-300 px-3 text-xs font-black text-[#091a35]">Save</button></form>}
+   {topQuests.length===0?<div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 p-5 text-center"><span className="text-3xl">🧭</span><p className="mt-2 text-sm font-bold text-white">Your day is wide open!</p><p className="mt-1 text-xs text-slate-400">Add one small win and get moving.</p><button onClick={()=>setShowQuestInput(true)} className="mt-3 rounded-xl bg-amber-300 px-4 py-2 text-xs font-black text-[#091a35]">Create first quest</button></div>:
+    <div className="space-y-2.5">{topQuests.map((q,i)=><button key={q.id} onClick={()=>toggleQuest(q.id)} className={'lifeos-quest-card '+(q.completed?'is-done':'')}><span className="lifeos-quest-number">{['1','2','3'][i]}</span><span className="min-w-0 flex-1 text-left"><span className={'block text-[12px] sm:text-sm font-bold leading-snug '+(q.completed?'line-through text-slate-500':'text-white')}>{q.title}</span><span className="mt-1 flex items-center gap-2 text-[10px] text-slate-400"><span>{q.category||'Personal'}</span><span>·</span><span><Clock size={10} className="inline"/> {q.durationMins||20} min</span><span>·</span><span className="text-amber-300">+{q.xp||50} XP</span></span></span><span className={'lifeos-quest-check '+(q.completed?'checked':'')}>{q.completed?<Check size={17}/>:<Circle size={19}/>}</span></button>)}</div>}
+  </section>
+
+  <section className="space-y-3">
+   <div><p className="text-[10px] font-bold uppercase tracking-[.16em] text-amber-300">Your world</p><h2 className="mt-1 text-lg sm:text-xl font-black text-white">Where to next? 🚀</h2></div>
+   <div className="grid grid-cols-2 gap-2.5 sm:gap-3">{tile.map(([tab,emoji,title,sub])=><button key={tab} onClick={()=>onNavigate(tab)} className="lifeos-launch-card"><span className="text-2xl sm:text-3xl">{emoji}</span><span className="mt-2 block text-sm font-extrabold text-white">{title}</span><span className="mt-0.5 block text-[10px] text-slate-400">{sub}</span><ArrowRight size={15} className="mt-2 text-amber-300"/></button>)}</div>
+  </section>
+
+  <section className="lifeos-cheer flex items-center gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-300/5 p-3.5">
+   <span className="text-2xl">🌟</span><p className="text-xs leading-relaxed text-slate-300"><strong className="text-emerald-200">A little reminder:</strong> You don't need a perfect day. Just one honest step.</p>
+  </section>
+ </div>;
 }
