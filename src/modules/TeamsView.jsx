@@ -12,7 +12,7 @@ export default function TeamsView({teams=[],ibos=[],onAddActivity,initialTeamId=
  const [phone,setPhone]=useState('');
  const [percentDraft,setPercentDraft]=useState({});
  const [saving,setSaving]=useState(false);
- useEffect(()=>{if(initialTeamId)setSelected(initialTeamId);},[initialTeamId]);
+ useEffect(()=>{setSelected(initialTeamId||'');},[initialTeamId]);
  const active=teams.find(t=>t.id===selected);
  const members=ibos.filter(x=>x.teamId===selected);
  const coreCount=members.filter(x=>x.meetingAttended&&x.bookingMade&&x.businessActive).length;
