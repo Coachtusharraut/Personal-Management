@@ -158,3 +158,21 @@ button:disabled{opacity:.55}
 @media(min-width:768px){.eagle-main{padding:25px 28px 45px}.eagle-home{max-width:790px}.eagle-hero{padding:24px 25px}.eagle-hero-top{min-height:160px}.eagle-art{height:148px}.eagle-hero h1{font-size:42px}.eagle-six-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.eagle-bottom-nav,.eagle-more-backdrop{display:none!important}.eagle-team-card{min-height:160px}}
 @media(max-width:380px){.eagle-main{padding-left:10px;padding-right:10px}.eagle-hero h1{font-size:27px}.eagle-six-grid{gap:5px}.eagle-team-chip{min-height:99px}.eagle-metric small{font-size:7px}.eagle-ibo-checks label{font-size:8px;padding:7px 5px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+.eagle-character-row{display:flex;gap:8px;margin-top:11px;align-items:center}
+.eagle-character-row span{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#ffdc8c,#9a5a20);border:1px solid #ffe9b8;font-size:17px;box-shadow:0 0 12px #e6ac4a55}
+.eagle-hero-avatar[class*="portrait-"]{background-image:url("https://coachtusharraut.com/wp-content/uploads/2026/11/eagle-structure-hero-characters.png");background-size:697% auto;background-repeat:no-repeat;width:62px;height:62px;border-radius:50%;border:2px solid #f4ca70;box-shadow:0 0 14px #dfa64a66;background-color:#1a2a43}
+.eagle-hero-avatar.portrait-0{background-position:14% 84%}
+.eagle-hero-avatar.portrait-1{background-position:34% 84%}
+.eagle-hero-avatar.portrait-2{background-position:55% 84%}
+.eagle-hero-avatar.portrait-3{background-position:77% 84%}
+.eagle-hero-avatar.portrait-4{background-position:98% 84%}
+.eagle-login{min-height:100dvh;padding:25px;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 10%,#36516f88,transparent 42%),linear-gradient(160deg,#09172a,#070d19);color:#fff}
+.eagle-login-card{width:100%;max-width:440px;padding:27px 22px;border-radius:28px;border:1px solid rgba(243,201,109,.28);background:linear-gradient(145deg,#1b3048,#0a1627);box-shadow:0 24px 80px #0009;text-align:center}
+.eagle-login-bird{font-size:72px;filter:drop-shadow(0 0 18px #e6b45277);animation:eagle-soar 3.8s ease-in-out infinite}
+.eagle-login-card h1{margin-top:13px;font-size:34px;font-weight:1000;line-height:1.02;color:#fff}
+.eagle-login-card h1 span{color:#f5cf7e}.eagle-login-sub{margin-top:10px;font-size:11px;color:#c2ccda}
+.eagle-login-map{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:24px 0}
+.eagle-login-map span{padding:12px 5px;border-radius:14px;background:#e9b95114;border:1px solid #e9b95133;font-size:18px}
+.eagle-login-map b{display:block;font-size:10px;color:#f6d68c}
+.eagle-login-button{width:100%;min-height:50px;border-radius:15px;background:linear-gradient(120deg,#ffe4a2,#dfa040);color:#241707;font-size:13px;font-weight:1000;display:flex;align-items:center;justify-content:center;gap:9px}
