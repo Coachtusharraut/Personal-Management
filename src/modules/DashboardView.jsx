@@ -25,7 +25,7 @@ export default function DashboardView({teams=[],ibos=[],prospects=[],activities=
  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date());
  const todayActivity=activities.filter(a=>(a.date||'')===today);
  const counts=useMemo(()=>[
-  {label:'People spoken to',value:totalTalks,icon:MessageCircle,tab:'people',color:'gold'},
+  {label:'Conversations',value:totalTalks,icon:MessageCircle,tab:'people',color:'gold'},
   {label:'Meetings booked',value:todayActivity.filter(a=>a.type==='meeting_booked').reduce((n,a)=>n+(Number(a.quantity)||1),0),icon:CalendarCheck,tab:'activity',color:'blue'},
   {label:'Core IBOs',value:core.length+'/60',icon:Users,tab:'teams',color:'green'}
  ],[totalTalks,todayActivity,core.length]);
