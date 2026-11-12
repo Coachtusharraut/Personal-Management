@@ -45,7 +45,11 @@ export default function DailyRemindersView({
 
   // Request browser notification permission
   const handleEnableNotifications = async () => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      setNotificationStatus('unsupported');
+      return;
+    }
+    try {
       const permission = await Notification.requestPermission();
       setNotificationStatus(permission);
       if (permission === 'granted') {
@@ -54,6 +58,9 @@ export default function DailyRemindersView({
           icon: '/favicon.ico'
         });
       }
+    } catch (error) {
+      console.warn('Notification permission could not be requested:', error);
+      setNotificationStatus('denied');
     }
   };
 
