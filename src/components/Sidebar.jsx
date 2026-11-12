@@ -1,40 +1,44 @@
 import React from 'react';
 import { 
   LayoutDashboard, 
-  CheckSquare, 
+  FlaskConical,
   Flame, 
+  Layers, 
+  CheckSquare, 
+  Heart, 
   FileText, 
   Wallet, 
-  Target, 
   Timer, 
   Settings,
   ShieldCheck,
-  ChevronRight
+  Target
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
+  { id: 'dashboard', label: 'Daily Mission Board', icon: LayoutDashboard, badge: null },
+  { id: 'mission_lab', label: 'Mission Lab: Obesity-Free', icon: FlaskConical, badge: 'ReshapeNation' },
+  { id: 'campaign', label: 'Speak to Impact ₹1L', icon: Flame, badge: 'Active' },
+  { id: 'goal_hierarchy', label: 'Goal Hierarchy & Vision', icon: Layers, badge: null },
   { id: 'tasks', label: 'Tasks & Kanban', icon: CheckSquare, badgeKey: 'tasksCount' },
-  { id: 'habits', label: 'Habits Tracker', icon: Flame, badgeKey: 'habitsCount' },
-  { id: 'notes', label: 'Notes & Journal', icon: FileText, badgeKey: 'notesCount' },
-  { id: 'finance', label: 'Finance & Budget', icon: Wallet, badge: null },
-  { id: 'goals', label: 'Goals & Vision', icon: Target, badge: null },
+  { id: 'habits', label: 'Habits & Rituals', icon: Heart, badgeKey: 'habitsCount' },
+  { id: 'notes', label: 'Notes & Strategy', icon: FileText, badgeKey: 'notesCount' },
+  { id: 'finance', label: 'Finance & Revenue', icon: Wallet, badge: null },
   { id: 'focus', label: 'Focus Timer', icon: Timer, badgeKey: 'focusActive' },
   { id: 'settings', label: 'Settings', icon: Settings, badge: null },
 ];
 
 export default function Sidebar({ activeTab, onSelectTab, counts = {}, isTimerRunning }) {
   return (
-    <aside className="w-64 flex-shrink-0 hidden md:flex flex-col border-r border-slate-800/80 bg-slate-950/60 backdrop-blur-xl h-[calc(100vh-4rem)] sticky top-16 select-none">
-      {/* Brand Title Subtitle */}
+    <aside className="w-64 flex-shrink-0 hidden md:flex flex-col border-r border-slate-800/80 bg-[#070b14]/90 backdrop-blur-xl h-[calc(100vh-4rem)] sticky top-16 select-none">
+      {/* Brand & Mission Status */}
       <div className="px-6 py-5 border-b border-slate-850">
         <div className="flex items-center space-x-2.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 ring-4 ring-emerald-500/20 animate-pulse" />
-          <span className="text-xs font-semibold text-slate-300 uppercase tracking-widest">
-            Workspace Hub
+          <div className="w-2.5 h-2.5 rounded-full bg-amber-400 ring-4 ring-amber-500/20 animate-pulse" />
+          <span className="text-xs font-extrabold text-amber-300 uppercase tracking-widest">
+            Tushar LifeOS
           </span>
         </div>
-        <p className="text-[11px] text-slate-400 mt-1">Personal Operating System</p>
+        <p className="text-[11px] text-slate-400 mt-1">Gamified Mission Command Centre</p>
       </div>
 
       {/* Navigation Items */}
@@ -43,7 +47,7 @@ export default function Sidebar({ activeTab, onSelectTab, counts = {}, isTimerRu
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           
-          let badgeValue = null;
+          let badgeValue = item.badge || null;
           if (item.id === 'tasks' && counts.pendingTasks > 0) {
             badgeValue = counts.pendingTasks;
           } else if (item.id === 'habits' && counts.pendingHabitsToday > 0) {
@@ -56,25 +60,29 @@ export default function Sidebar({ activeTab, onSelectTab, counts = {}, isTimerRu
             <button
               key={item.id}
               onClick={() => onSelectTab(item.id)}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all group ${
                 isActive
-                  ? 'bg-gradient-to-r from-indigo-600/90 to-indigo-500/90 text-white shadow-lg shadow-indigo-600/20'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold shadow-lg shadow-amber-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
               }`}
             >
-              <div className="flex items-center space-x-3">
-                <Icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-indigo-400'}`} />
-                <span>{item.label}</span>
+              <div className="flex items-center space-x-3 truncate">
+                <Icon className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-slate-950 stroke-[2.5]' : 'text-slate-400 group-hover:text-amber-400'}`} />
+                <span className="truncate">{item.label}</span>
               </div>
 
               {badgeValue && (
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight ${
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight flex-shrink-0 ${
                     isActive 
-                      ? 'bg-white/20 text-white' 
-                      : item.id === 'focus'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-pulse'
-                        : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
+                      ? 'bg-slate-950/20 text-slate-950' 
+                      : item.id === 'campaign'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : item.id === 'mission_lab'
+                          ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20 text-[9px]'
+                          : item.id === 'focus'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-pulse'
+                            : 'bg-slate-800 text-slate-400'
                   }`}
                 >
                   {badgeValue}
@@ -87,12 +95,12 @@ export default function Sidebar({ activeTab, onSelectTab, counts = {}, isTimerRu
 
       {/* Bottom Status Box */}
       <div className="p-4 m-3 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-850/80 border border-slate-800">
-        <div className="flex items-center space-x-2 mb-1.5 text-indigo-400 text-xs font-semibold">
+        <div className="flex items-center space-x-2 mb-1.5 text-amber-400 text-xs font-semibold">
           <ShieldCheck className="w-4 h-4" />
-          <span>Firebase Protected</span>
+          <span>Mission Lab Online</span>
         </div>
         <p className="text-[11px] text-slate-400 leading-relaxed">
-          Cloud Firestore encrypted & user-isolated security rules enabled.
+          Primary: Obesity-Free India via ReshapeNation platform.
         </p>
       </div>
     </aside>

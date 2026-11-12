@@ -356,6 +356,16 @@ export function exportAllData(userId) {
     const data = localStorage.getItem(key);
     result[col] = data ? JSON.parse(data) : (INITIAL_DATA[col] || []);
   });
+  // Include LifeOS Mission State (Obesity-Free India, Campaign, Daily Quests)
+  try {
+    const missionKey = `tushar_lifeos_${userId || 'guest'}_state`;
+    const missionData = localStorage.getItem(missionKey);
+    if (missionData) {
+      result.lifeos_mission = JSON.parse(missionData);
+    }
+  } catch (e) {
+    console.warn('Error exporting mission state:', e);
+  }
   return JSON.stringify(result, null, 2);
 }
 
@@ -370,6 +380,12 @@ export function importAllData(userId, jsonString) {
         window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify(parsed[col]) }));
       }
     });
+    // Import LifeOS Mission State
+    if (parsed.lifeos_mission) {
+      const missionKey = `tushar_lifeos_${userId || 'guest'}_state`;
+      localStorage.setItem(missionKey, JSON.stringify(parsed.lifeos_mission));
+      window.dispatchEvent(new StorageEvent('storage', { key: missionKey, newValue: JSON.stringify(parsed.lifeos_mission) }));
+    }
     return true;
   } catch (err) {
     console.error('Import error:', err);
