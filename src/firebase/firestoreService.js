@@ -1,394 +1,146 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  onSnapshot, 
-  query, 
-  orderBy, 
-  serverTimestamp 
+import {
+  collection,
+  doc,
+  addDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  getDoc,
+  onSnapshot,
+  serverTimestamp,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from './config';
 
-// Initial seed data for Tushar Raut
+export const DATA_COLLECTIONS = ['tasks','habits','notes','expenses','goals','stories','opportunities'];
 export const INITIAL_DATA = {
-  tasks: [
-    {
-      id: 'task-1',
-      title: 'Review System Architecture & Cloud Firestore Rules',
-      description: 'Audit production security rules, verify index configurations, and optimize query latency.',
-      status: 'in-progress',
-      priority: 'urgent',
-      dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-      category: 'Engineering',
-      subtasks: [
-        { id: 'st-1', text: 'Check collection security rules', completed: true },
-        { id: 'st-2', text: 'Configure composite indexes', completed: true },
-        { id: 'st-3', text: 'Deploy to Firebase Hosting', completed: false }
-      ]
-    },
-    {
-      id: 'task-2',
-      title: 'Quarterly Financial Health & Investment Review',
-      description: 'Analyze monthly recurring expenses, mutual funds SIP allocations, and emergency fund ratio.',
-      status: 'todo',
-      priority: 'high',
-      dueDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
-      category: 'Finance',
-      subtasks: [
-        { id: 'st-4', text: 'Export bank statements', completed: false },
-        { id: 'st-5', text: 'Update portfolio balance sheet', completed: false }
-      ]
-    },
-    {
-      id: 'task-3',
-      title: 'Deep Work: Complete 3 Pomodoro Focus Sessions',
-      description: 'Zero interruptions, phone on DND, focus on high-impact software design.',
-      status: 'done',
-      priority: 'medium',
-      dueDate: new Date().toISOString().split('T')[0],
-      category: 'Productivity',
-      subtasks: [
-        { id: 'st-6', text: 'Session 1: Feature specs', completed: true },
-        { id: 'st-7', text: 'Session 2: Core modules', completed: true }
-      ]
-    },
-    {
-      id: 'task-4',
-      title: 'Workout & 10,000 Steps Daily Routine',
-      description: 'Push-pull workout followed by an evening brisk walk.',
-      status: 'todo',
-      priority: 'medium',
-      dueDate: new Date().toISOString().split('T')[0],
-      category: 'Health',
-      subtasks: []
-    }
-  ],
-  habits: [
-    {
-      id: 'habit-1',
-      name: 'Morning Hydration & 15m Mobility',
-      description: '500ml water + full body stretching upon waking up',
-      category: 'Health',
-      streak: 14,
-      targetDays: 7,
-      history: {
-        [new Date().toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 86400000).toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 3 * 86400000).toISOString().split('T')[0]]: true,
-      }
-    },
-    {
-      id: 'habit-2',
-      name: 'Read 20 Pages (Tech / Leadership / Philosophy)',
-      description: 'Consistent daily compound learning',
-      category: 'Mindset',
-      streak: 9,
-      targetDays: 7,
-      history: {
-        [new Date().toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 86400000).toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0]]: true,
-      }
-    },
-    {
-      id: 'habit-3',
-      name: 'Coding & AI Exploration',
-      description: 'Build or refactor components, test agentic workflows',
-      category: 'Engineering',
-      streak: 21,
-      targetDays: 7,
-      history: {
-        [new Date().toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 86400000).toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0]]: true,
-        [new Date(Date.now() - 3 * 86400000).toISOString().split('T')[0]]: true,
-      }
-    },
-    {
-      id: 'habit-4',
-      name: 'Daily Reflection & Journaling',
-      description: 'Log wins, lessons, and top 3 priorities for tomorrow',
-      category: 'Productivity',
-      streak: 6,
-      targetDays: 5,
-      history: {
-        [new Date(Date.now() - 86400000).toISOString().split('T')[0]]: true,
-      }
-    }
-  ],
-  notes: [
-    {
-      id: 'note-1',
-      title: 'Tushar Raut OS Architecture & Philosophy',
-      content: '# Vision for Personal Management\n\n- **Decoupled execution**: Separate planning from execution to eliminate context switching.\n- **Real-time feedback loops**: Fast metrics, streak tracking, and automated summaries.\n- **Data Sovereignty**: Full cloud backup with instant one-click JSON export.\n\n### Core Pillars:\n1. Health & Energy\n2. High-leverage Engineering\n3. Financial Freedom\n4. Continuous Learning',
-      category: 'Philosophy',
-      pinned: true,
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: 'note-2',
-      title: 'Firebase Optimization Cheatsheet',
-      content: '### Key Tips for Cloud Firestore & Auth\n- Use subcollections `/users/{uid}/...` for clean security rules and isolation.\n- IndexedDB persistence keeps the app instant and functional offline.\n- Real-time listeners (`onSnapshot`) auto-unsubscribe on component unmount.',
-      category: 'Engineering',
-      pinned: false,
-      updatedAt: new Date(Date.now() - 86400000).toISOString()
-    }
-  ],
-  expenses: [
-    {
-      id: 'exp-1',
-      description: 'Cloud Server & Dev Tools Subscription',
-      amount: 48.00,
-      type: 'expense',
-      category: 'Technology',
-      date: new Date().toISOString().split('T')[0]
-    },
-    {
-      id: 'exp-2',
-      description: 'Consulting & Software Engineering Retainer',
-      amount: 3200.00,
-      type: 'income',
-      category: 'Income',
-      date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0]
-    },
-    {
-      id: 'exp-3',
-      description: 'Health Food & Nutrition Supplies',
-      amount: 72.50,
-      type: 'expense',
-      category: 'Health',
-      date: new Date(Date.now() - 86400000).toISOString().split('T')[0]
-    },
-    {
-      id: 'exp-4',
-      description: 'Kindle & Audiobooks',
-      amount: 19.99,
-      type: 'expense',
-      category: 'Education',
-      date: new Date(Date.now() - 4 * 86400000).toISOString().split('T')[0]
-    }
-  ],
-  goals: [
-    {
-      id: 'goal-1',
-      title: 'Master Agentic AI & Autonomous Systems',
-      category: 'Career & Tech',
-      progress: 75,
-      targetDate: '2026-12-31',
-      milestones: [
-        { text: 'Build modular agent workflows', done: true },
-        { text: 'Integrate MCP servers & tools', done: true },
-        { text: 'Deploy production autonomous assistants', done: false }
-      ]
-    },
-    {
-      id: 'goal-2',
-      title: 'Hit 15% Body Fat & Run 10K under 50 Mins',
-      category: 'Fitness',
-      progress: 60,
-      targetDate: '2026-12-31',
-      milestones: [
-        { text: 'Consistent 4x weekly strength training', done: true },
-        { text: 'Complete 5K under 24 mins', done: true },
-        { text: 'Run 10K endurance benchmark', done: false }
-      ]
-    },
-    {
-      id: 'goal-3',
-      title: 'Build & Scale Personal Software Ecosystem',
-      category: 'Projects',
-      progress: 85,
-      targetDate: '2026-12-31',
-      milestones: [
-        { text: 'Deploy personal webapp on Firebase', done: true },
-        { text: 'Sync cross-device real-time state', done: true },
-        { text: 'Add AI assistant integrations', done: false }
-      ]
-    }
-  ]
+  tasks: [],
+  habits: [],
+  notes: [],
+  expenses: [],
+  goals: [],
+  stories: [],
+  opportunities: []
 };
 
-// Helper to get local storage key
-const getLocalKey = (userId, collectionName) => `tr_mgmt_${userId || 'guest'}_${collectionName}`;
+const getLocalKey = (userId, collectionName) => `tr_mgmt_${userId}_${collectionName}`;
+const requireOwner = (userId) => {
+  if (!userId || userId.startsWith('tushar_demo') || userId.startsWith('guest')) {
+    throw new Error('A signed-in owner account is required to use cloud LifeOS data.');
+  }
+};
+const readCache = (userId, collectionName) => {
+  try {
+    return JSON.parse(localStorage.getItem(getLocalKey(userId,collectionName)) || '[]');
+  } catch {
+    return [];
+  }
+};
+const writeCache = (userId, collectionName, items) => {
+  try {
+    localStorage.setItem(getLocalKey(userId,collectionName),JSON.stringify(items));
+  } catch (error) {
+    console.warn('LifeOS cache could not be updated:',error);
+  }
+};
 
 export function subscribeCollection(userId, collectionName, callback) {
-  if (!userId || userId.startsWith('tushar_demo') || userId.startsWith('guest')) {
-    // Guest or demo mode -> use LocalStorage with real-time sync
-    const key = getLocalKey(userId, collectionName);
-    const stored = localStorage.getItem(key);
-    let data;
-    if (stored) {
-      try {
-        data = JSON.parse(stored);
-      } catch {
-        data = INITIAL_DATA[collectionName] || [];
-      }
-    } else {
-      data = INITIAL_DATA[collectionName] || [];
-      localStorage.setItem(key, JSON.stringify(data));
-    }
-    callback(data);
-
-    // Event listener for storage changes
-    const handler = (e) => {
-      if (e.key === key) {
-        callback(JSON.parse(e.newValue || '[]'));
-      }
-    };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }
-
-  // Real Firebase Firestore subscription
-  try {
-    const colRef = collection(db, 'users', userId, collectionName);
-    const q = query(colRef);
-    const unsubscribe = onSnapshot(colRef, (snapshot) => {
-      if (snapshot.empty) {
-        // If collection empty in firestore, initialize seed data for user convenience
-        const initial = INITIAL_DATA[collectionName] || [];
-        callback(initial);
-      } else {
-        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        callback(items);
-      }
-    }, (error) => {
-      console.warn(`Firestore listener error on ${collectionName}:`, error);
-      // Fallback to local
-      const key = getLocalKey(userId, collectionName);
-      const cached = localStorage.getItem(key);
-      callback(cached ? JSON.parse(cached) : (INITIAL_DATA[collectionName] || []));
-    });
-    return unsubscribe;
-  } catch (err) {
-    console.error(`Error subscribing to ${collectionName}:`, err);
-    callback(INITIAL_DATA[collectionName] || []);
+  if (!userId) {
+    callback([]);
     return () => {};
   }
-}
-
-export async function addItem(userId, collectionName, item) {
-  const newItem = {
-    ...item,
-    id: item.id || `${collectionName}-${Date.now()}`,
-    createdAt: new Date().toISOString()
-  };
-
-  if (!userId || userId.startsWith('tushar_demo') || userId.startsWith('guest')) {
-    const key = getLocalKey(userId, collectionName);
-    const existing = JSON.parse(localStorage.getItem(key) || JSON.stringify(INITIAL_DATA[collectionName] || []));
-    const updated = [newItem, ...existing];
-    localStorage.setItem(key, JSON.stringify(updated));
-    // Trigger custom event to notify current window
-    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify(updated) }));
-    return newItem;
-  }
-
-  try {
-    const colRef = collection(db, 'users', userId, collectionName);
-    const docRef = await addDoc(colRef, {
-      ...newItem,
-      serverTime: serverTimestamp()
-    });
-    return { ...newItem, id: docRef.id };
-  } catch (error) {
-    console.warn(`Failed writing to Firestore, falling back to local:`, error);
-    const key = getLocalKey(userId, collectionName);
-    const existing = JSON.parse(localStorage.getItem(key) || JSON.stringify(INITIAL_DATA[collectionName] || []));
-    const updated = [newItem, ...existing];
-    localStorage.setItem(key, JSON.stringify(updated));
-    return newItem;
-  }
-}
-
-export async function updateItem(userId, collectionName, id, updates) {
-  if (!userId || userId.startsWith('tushar_demo') || userId.startsWith('guest')) {
-    const key = getLocalKey(userId, collectionName);
-    const existing = JSON.parse(localStorage.getItem(key) || JSON.stringify(INITIAL_DATA[collectionName] || []));
-    const updated = existing.map(item => item.id === id ? { ...item, ...updates } : item);
-    localStorage.setItem(key, JSON.stringify(updated));
-    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify(updated) }));
-    return;
-  }
-
-  try {
-    const docRef = doc(db, 'users', userId, collectionName, id);
-    await updateDoc(docRef, updates);
-  } catch (error) {
-    console.warn('Update failed in firestore, syncing locally:', error);
-    const key = getLocalKey(userId, collectionName);
-    const existing = JSON.parse(localStorage.getItem(key) || '[]');
-    const updated = existing.map(item => item.id === id ? { ...item, ...updates } : item);
-    localStorage.setItem(key, JSON.stringify(updated));
-  }
-}
-
-export async function deleteItem(userId, collectionName, id) {
-  if (!userId || userId.startsWith('tushar_demo') || userId.startsWith('guest')) {
-    const key = getLocalKey(userId, collectionName);
-    const existing = JSON.parse(localStorage.getItem(key) || JSON.stringify(INITIAL_DATA[collectionName] || []));
-    const updated = existing.filter(item => item.id !== id);
-    localStorage.setItem(key, JSON.stringify(updated));
-    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify(updated) }));
-    return;
-  }
-
-  try {
-    const docRef = doc(db, 'users', userId, collectionName, id);
-    await deleteDoc(docRef);
-  } catch (error) {
-    console.warn('Delete failed in firestore, updating locally:', error);
-    const key = getLocalKey(userId, collectionName);
-    const existing = JSON.parse(localStorage.getItem(key) || '[]');
-    const updated = existing.filter(item => item.id !== id);
-    localStorage.setItem(key, JSON.stringify(updated));
-  }
-}
-
-// Export all user data as formatted JSON
-export function exportAllData(userId) {
-  const result = {};
-  ['tasks', 'habits', 'notes', 'expenses', 'goals'].forEach(col => {
-    const key = getLocalKey(userId, col);
-    const data = localStorage.getItem(key);
-    result[col] = data ? JSON.parse(data) : (INITIAL_DATA[col] || []);
+  const colRef = collection(db,'users',userId,collectionName);
+  return onSnapshot(colRef,(snapshot)=>{
+    const items=snapshot.docs.map(item=>({id:item.id,...item.data()}));
+    writeCache(userId,collectionName,items);
+    callback(items);
+  },(error)=>{
+    console.error('Firestore listener failed for '+collectionName+':',error);
+    // IndexedDB persistence handles normal offline reads. Use a last-synced cache only
+    // for transient network loss; permission errors must never expose stale local data.
+    if(error?.code==='unavailable' || error?.code==='deadline-exceeded'){
+      callback(readCache(userId,collectionName));
+    }else{
+      callback([]);
+    }
   });
-  // Include LifeOS Mission State (Obesity-Free India, Campaign, Daily Quests)
-  try {
-    const missionKey = `tushar_lifeos_${userId || 'guest'}_state`;
-    const missionData = localStorage.getItem(missionKey);
-    if (missionData) {
-      result.lifeos_mission = JSON.parse(missionData);
-    }
-  } catch (e) {
-    console.warn('Error exporting mission state:', e);
-  }
-  return JSON.stringify(result, null, 2);
 }
 
-// Import all user data
-export function importAllData(userId, jsonString) {
-  try {
-    const parsed = JSON.parse(jsonString);
-    ['tasks', 'habits', 'notes', 'expenses', 'goals'].forEach(col => {
-      if (parsed[col]) {
-        const key = getLocalKey(userId, col);
-        localStorage.setItem(key, JSON.stringify(parsed[col]));
-        window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify(parsed[col]) }));
-      }
-    });
-    // Import LifeOS Mission State
-    if (parsed.lifeos_mission) {
-      const missionKey = `tushar_lifeos_${userId || 'guest'}_state`;
-      localStorage.setItem(missionKey, JSON.stringify(parsed.lifeos_mission));
-      window.dispatchEvent(new StorageEvent('storage', { key: missionKey, newValue: JSON.stringify(parsed.lifeos_mission) }));
-    }
-    return true;
-  } catch (err) {
-    console.error('Import error:', err);
-    return false;
+export async function addItem(userId,collectionName,item) {
+  requireOwner(userId);
+  if(!DATA_COLLECTIONS.includes(collectionName))throw new Error('Unsupported LifeOS collection.');
+  const newItem={...item,createdAt:item.createdAt||new Date().toISOString()};
+  const colRef=collection(db,'users',userId,collectionName);
+  const docRef=await addDoc(colRef,{...newItem,serverTime:serverTimestamp()});
+  const saved={...newItem,id:docRef.id};
+  const cache=readCache(userId,collectionName);
+  writeCache(userId,collectionName,[saved,...cache.filter(x=>x.id!==saved.id)]);
+  return saved;
+}
+
+export async function updateItem(userId,collectionName,id,updates) {
+  requireOwner(userId);
+  if(!DATA_COLLECTIONS.includes(collectionName))throw new Error('Unsupported LifeOS collection.');
+  const docRef=doc(db,'users',userId,collectionName,id);
+  await updateDoc(docRef,updates);
+  const items=readCache(userId,collectionName).map(item=>item.id===id?{...item,...updates}:item);
+  writeCache(userId,collectionName,items);
+}
+
+export async function deleteItem(userId,collectionName,id) {
+  requireOwner(userId);
+  if(!DATA_COLLECTIONS.includes(collectionName))throw new Error('Unsupported LifeOS collection.');
+  await deleteDoc(doc(db,'users',userId,collectionName,id));
+  writeCache(userId,collectionName,readCache(userId,collectionName).filter(item=>item.id!==id));
+}
+
+export async function exportAllData(userId) {
+  requireOwner(userId);
+  const result={exportedAt:new Date().toISOString(),owner:userId};
+  for(const collectionName of DATA_COLLECTIONS){
+    const snapshot=await getDocs(collection(db,'users',userId,collectionName));
+    result[collectionName]=snapshot.docs.map(item=>({id:item.id,...item.data()}));
+    writeCache(userId,collectionName,result[collectionName]);
   }
+  const mission=await getDoc(doc(db,'users',userId,'lifeos_mission','primary'));
+  result.lifeos_mission=mission.exists()?mission.data():null;
+  return JSON.stringify(result,null,2);
+}
+
+export async function importAllData(userId,jsonString) {
+  requireOwner(userId);
+  const parsed=JSON.parse(jsonString);
+  const accepted=DATA_COLLECTIONS.filter(name=>Array.isArray(parsed[name]));
+  for(const name of accepted){
+    const list=parsed[name];
+    for(let start=0;start<list.length;start+=400){
+      const batch=writeBatch(db);
+      list.slice(start,start+400).forEach(item=>{
+        const {id,...data}=item;
+        const ref=id?doc(db,'users',userId,name,String(id)):doc(collection(db,'users',userId,name));
+        batch.set(ref,{...data,restoredAt:new Date().toISOString()},{merge:true});
+      });
+      await batch.commit();
+    }
+  }
+  if(parsed.lifeos_mission && typeof parsed.lifeos_mission==='object'){
+    await setDoc(doc(db,'users',userId,'lifeos_mission','primary'),parsed.lifeos_mission,{merge:false});
+  }
+  return true;
+}
+
+export async function clearAllUserData(userId) {
+  requireOwner(userId);
+  for(const collectionName of DATA_COLLECTIONS){
+    const colRef=collection(db,'users',userId,collectionName);
+    const snapshot=await getDocs(colRef);
+    for(let start=0;start<snapshot.docs.length;start+=400){
+      const batch=writeBatch(db);
+      snapshot.docs.slice(start,start+400).forEach(item=>batch.delete(item.ref));
+      await batch.commit();
+    }
+    writeCache(userId,collectionName,[]);
+  }
+  await deleteDoc(doc(db,'users',userId,'lifeos_mission','primary'));
 }
