@@ -15,7 +15,11 @@ import {
   Timer, 
   Settings,
   ShieldCheck,
-  Target
+  Target,
+  BriefcaseBusiness,
+  Mic2,
+  CalendarDays,
+  Compass
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
@@ -27,6 +31,10 @@ export const NAV_ITEMS = [
   { id: 'mission_lab', label: 'Mission Lab: Obesity-Free', icon: FlaskConical, badge: 'ReshapeNation' },
   { id: 'campaign', label: 'Speak to Impact ₹1L', icon: Flame, badge: 'Active' },
   { id: 'goal_hierarchy', label: 'Goal Hierarchy & Vision', icon: Layers, badge: null },
+  { id: 'career', label: 'Career & Life Goals', icon: BriefcaseBusiness, badge: 'Tracks' },
+  { id: 'story_forge', label: 'Story & Speaking Forge', icon: Mic2, badge: 'Chronicle' },
+  { id: 'opportunities', label: 'Opportunity Radar', icon: Compass, badge: 'Pipeline' },
+  { id: 'calendar', label: 'Calendar & Reminders', icon: CalendarDays, badge: 'Sync' },
   { id: 'tasks', label: 'Tasks & Kanban', icon: CheckSquare, badgeKey: 'tasksCount' },
   { id: 'habits', label: 'Habits & Rituals', icon: Heart, badgeKey: 'habitsCount' },
   { id: 'notes', label: 'Notes & Strategy', icon: FileText, badgeKey: 'notesCount' },
