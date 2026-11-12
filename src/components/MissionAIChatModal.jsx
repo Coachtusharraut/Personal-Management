@@ -66,7 +66,7 @@ export default function MissionAIChatModal({
       id: 'msg-init',
       sender: 'ai',
       specialistId: 'strategist',
-      text: "Namaste Tushar. I am your Mission AI. We are currently executing Day 1 of the 'Speak to Impact — ₹1 Lakh Challenge' for ReshapeNation. With ₹25,000 collected and 5 consultations completed, how can we leverage your speaking strength today to close our next milestone?",
+      text: "Namaste Tushar. I am your LifeOS Mission Guide. Let's turn your real priorities into a clear plan. What is the one outcome that would make today meaningful?",
       timestamp: 'Just now'
     }
   ]);
