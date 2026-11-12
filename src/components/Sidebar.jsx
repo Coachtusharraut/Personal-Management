@@ -1,6 +1,10 @@
 import React from 'react';
 import { 
   LayoutDashboard, 
+  Bell,
+  Sparkles,
+  BookOpen,
+  Sword,
   FlaskConical,
   Flame, 
   Layers, 
@@ -16,6 +20,10 @@ import {
 
 export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Daily Mission Board', icon: LayoutDashboard, badge: null },
+  { id: 'reminders', label: '3x Daily Rituals & Videos', icon: Bell, badge: 'Daily' },
+  { id: 'mood', label: 'Mood Sanctuary', icon: Sparkles, badge: 'Oracle' },
+  { id: 'chronicles', label: 'Legacy Chronicles', icon: BookOpen, badge: '4 Worlds' },
+  { id: 'boss', label: 'Weekly Boss Battle', icon: Sword, badge: 'Leviathan' },
   { id: 'mission_lab', label: 'Mission Lab: Obesity-Free', icon: FlaskConical, badge: 'ReshapeNation' },
   { id: 'campaign', label: 'Speak to Impact ₹1L', icon: Flame, badge: 'Active' },
   { id: 'goal_hierarchy', label: 'Goal Hierarchy & Vision', icon: Layers, badge: null },
@@ -78,11 +86,15 @@ export default function Sidebar({ activeTab, onSelectTab, counts = {}, isTimerRu
                       ? 'bg-slate-950/20 text-slate-950' 
                       : item.id === 'campaign'
                         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        : item.id === 'mission_lab'
-                          ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20 text-[9px]'
-                          : item.id === 'focus'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-pulse'
-                            : 'bg-slate-800 text-slate-400'
+                        : item.id === 'reminders'
+                          ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                          : item.id === 'mood'
+                            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                            : item.id === 'boss'
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              : item.id === 'focus'
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-pulse'
+                                : 'bg-slate-800 text-slate-400'
                   }`}
                 >
                   {badgeValue}
@@ -97,10 +109,10 @@ export default function Sidebar({ activeTab, onSelectTab, counts = {}, isTimerRu
       <div className="p-4 m-3 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-850/80 border border-slate-800">
         <div className="flex items-center space-x-2 mb-1.5 text-amber-400 text-xs font-semibold">
           <ShieldCheck className="w-4 h-4" />
-          <span>Mission Lab Online</span>
+          <span>Obesity-Free India</span>
         </div>
         <p className="text-[11px] text-slate-400 leading-relaxed">
-          Primary: Obesity-Free India via ReshapeNation platform.
+          ReshapeNation Platform • Speak to Impact Campaign Active.
         </p>
       </div>
     </aside>

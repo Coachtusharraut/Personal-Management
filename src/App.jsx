@@ -5,9 +5,14 @@ import { subscribeMissionData, saveMissionState } from './firebase/missionServic
 import Navbar from './components/Navbar';
 import Sidebar, { NAV_ITEMS } from './components/Sidebar';
 import QuickAddModal from './components/QuickAddModal';
-import { Timer, FlaskConical, Flame, Layers } from 'lucide-react';
+import YouTubePlayerModal from './components/YouTubePlayerModal';
+import MissionAIChatModal from './components/MissionAIChatModal';
 
 import DashboardView from './modules/DashboardView';
+import DailyRemindersView from './modules/DailyRemindersView';
+import MoodSanctuaryView from './modules/MoodSanctuaryView';
+import LegacyChroniclesView from './modules/LegacyChroniclesView';
+import BossChallengeView from './modules/BossChallengeView';
 import MissionLabView from './modules/MissionLabView';
 import CampaignView from './modules/CampaignView';
 import GoalHierarchyView from './modules/GoalHierarchyView';
@@ -18,13 +23,30 @@ import FinanceView from './modules/FinanceView';
 import FocusTimerView from './modules/FocusTimerView';
 import SettingsView from './modules/SettingsView';
 
+import { 
+  Bot, 
+  Sparkles, 
+  Bell, 
+  Flame, 
+  FlaskConical, 
+  BookOpen, 
+  Sword, 
+  Layers, 
+  Timer,
+  CheckSquare
+} from 'lucide-react';
+
 export default function App() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
-  // Core LifeOS Mission State (Obesity-Free India, Campaign, Daily Quests)
+  // Modals
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
+  const [activeVideoModal, setActiveVideoModal] = useState(null);
+
+  // Core LifeOS Mission State
   const [missionState, setMissionState] = useState(null);
 
   // Existing collections state
@@ -59,13 +81,35 @@ export default function App() {
     saveMissionState(user.uid, updates);
   };
 
+  // Convert an external insight/video takeaway to a daily quest
+  const handleAddQuestFromSource = (questData) => {
+    const dailyQuests = missionState?.dailyQuests || [];
+    const newQuest = {
+      id: `quest-${Date.now()}`,
+      title: questData.title,
+      description: questData.description || 'Added from LifeOS Growth Station',
+      category: questData.category || 'Learning',
+      tier: questData.tier || 'supporting',
+      priority: questData.priority || 'high',
+      durationMins: questData.durationMins || 20,
+      dueDate: new Date().toISOString().split('T')[0],
+      status: 'todo',
+      xp: questData.xp || 75,
+      completed: false
+    };
+
+    handleSaveMissionState({
+      dailyQuests: [newQuest, ...dailyQuests]
+    });
+  };
+
   // Compute counts for badges
   const todayStr = new Date().toISOString().split('T')[0];
   const pendingTasks = tasks.filter(t => t.status !== 'done').length;
   const pendingHabitsToday = habits.filter(h => !h.history || !h.history[todayStr]).length;
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
+    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200 relative">
       {/* Top Command Navbar */}
       <Navbar 
         onOpenQuickAdd={() => setIsQuickAddOpen(true)}
@@ -84,7 +128,7 @@ export default function App() {
         />
 
         {/* Dynamic Module Container */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto pb-28 md:pb-8 min-w-0">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto pb-32 md:pb-12 min-w-0">
           {activeTab === 'dashboard' && (
             <DashboardView 
               missionState={missionState}
@@ -95,6 +139,36 @@ export default function App() {
               goals={goals}
               onNavigate={setActiveTab}
               onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+            />
+          )}
+
+          {activeTab === 'reminders' && (
+            <DailyRemindersView 
+              missionState={missionState}
+              onSaveMissionState={handleSaveMissionState}
+              onPlayVideo={(vid) => setActiveVideoModal(vid)}
+            />
+          )}
+
+          {activeTab === 'mood' && (
+            <MoodSanctuaryView 
+              missionState={missionState}
+              onSaveMissionState={handleSaveMissionState}
+              onPlayVideo={(vid) => setActiveVideoModal(vid)}
+            />
+          )}
+
+          {activeTab === 'chronicles' && (
+            <LegacyChroniclesView 
+              missionState={missionState}
+              onSaveMissionState={handleSaveMissionState}
+            />
+          )}
+
+          {activeTab === 'boss' && (
+            <BossChallengeView 
+              missionState={missionState}
+              onNavigate={setActiveTab}
             />
           )}
 
@@ -132,15 +206,27 @@ export default function App() {
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation Bar (Hidden on Desktop) */}
+      {/* Floating Action Button: ASK MY MISSION AI */}
+      <div className="fixed bottom-20 md:bottom-6 right-5 z-40">
+        <button
+          onClick={() => setIsAiChatOpen(true)}
+          className="group relative flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-amber-300"
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-slate-950 animate-ping absolute top-1 right-1" />
+          <Bot className="w-5 h-5 stroke-[2.5] text-slate-950 animate-bounce" />
+          <span className="tracking-tight">ASK MY MISSION AI</span>
+        </button>
+      </div>
+
+      {/* Mobile Bottom Navigation Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b14]/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-2 flex items-center justify-around">
         {[
           { id: 'dashboard', label: 'Board', icon: NAV_ITEMS[0].icon },
-          { id: 'mission_lab', label: 'Lab', icon: FlaskConical },
+          { id: 'reminders', label: '3x Videos', icon: Bell },
+          { id: 'mood', label: 'Mood', icon: Sparkles },
           { id: 'campaign', label: '₹1L', icon: Flame },
-          { id: 'goal_hierarchy', label: 'Vision', icon: Layers },
-          { id: 'tasks', label: 'Tasks', icon: NAV_ITEMS[4].icon },
-          { id: 'focus', label: 'Focus', icon: Timer }
+          { id: 'chronicles', label: 'Story', icon: BookOpen },
+          { id: 'boss', label: 'Boss', icon: Sword }
         ].map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -169,6 +255,22 @@ export default function App() {
           if (type === 'note') setActiveTab('notes');
           if (type === 'expense') setActiveTab('finance');
         }}
+      />
+
+      {/* YouTube Player Modal */}
+      <YouTubePlayerModal 
+        isOpen={!!activeVideoModal}
+        onClose={() => setActiveVideoModal(null)}
+        video={activeVideoModal}
+        onAddQuestFromVideo={handleAddQuestFromSource}
+      />
+
+      {/* Mission AI Chat Modal */}
+      <MissionAIChatModal 
+        isOpen={isAiChatOpen}
+        onClose={() => setIsAiChatOpen(false)}
+        missionState={missionState}
+        onAddQuest={handleAddQuestFromSource}
       />
     </div>
   );
