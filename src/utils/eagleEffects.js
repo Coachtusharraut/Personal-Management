@@ -3,6 +3,7 @@ export function playEagleSound(kind='win'){
     const AudioContext=window.AudioContext||window.webkitAudioContext;
     if(!AudioContext)return;
     const ctx=new AudioContext();
+    ctx.resume?.().catch(()=>{});
     const now=ctx.currentTime;
     const notes=kind==='win'?[392,523.25,659.25,783.99]:kind==='miss'?[392,329.63,261.63]:kind==='eagle'?[980,1260,900,1180]:[480,620,530];
     notes.forEach((frequency,index)=>{
