@@ -1,37 +1,28 @@
 # Eagle Structure — LifeOS
 
-**One mission:** complete meaningful tasks, build consistency, and turn progress into a visible journey.
+**One mission:** complete meaningful tasks, see your progress, and advance a story through the Sahyadri.
 
 ## Live app
-
 https://coachtusharraut.com/life/
 
-The active WordPress plugin is **Eagle Structure LifeOS v1.2.0**. The page is password-protected and remains outside the public site navigation.
+The active WordPress plugin is **Eagle Structure LifeOS v1.3.0**. The page is published, password-protected and outside the public site navigation.
 
-## What the app does now
+## Current experience
+- Compact Eagle dashboard with live completion, task/step totals and XP.
+- Level 1: Motivational Interviewing Book Study.
+- Editable tasks and checkable subtasks.
+- Dynamic campaign map: one fort marker per current task.
+- Fort capture, eagle flight, animated victory effects, a short chime and optional vibration.
 
-- One compact Eagle progress dashboard.
-- Level 1: **Motivational Interviewing Book Study**, seeded with eight starter quests.
-- Expandable tasks with individual progress indicators.
-- Tickable subtasks; add, edit and remove subtasks.
-- Add, edit and remove tasks.
-- Overall completion, XP and rank.
-- A story-driven Sahyadri fort map: completing each quest captures a fort and advances the campaign narrative.
-- Mobile-first layout.
+Every add/edit/remove/check action recalculates the task list, counters, progress and campaign map. Completing all subtasks in a task captures its fort.
 
-## Deliberately removed
+## Deliberately excluded
+People, teams, IBOs, activity logs, Eagle Council, assistant, Field Guide, history/undo and other business-management screens remain removed.
 
-The older people/prospect pipeline, teams/wings, IBO tracking, activity logs, Eagle Council, assistant, history/undo, Field Guide and backup/restore screens are not part of this simplified app. The new saved state model contains only Level 1 and its tasks/subtasks.
+## Release notes
+See [WordPress plugin v1.3.0](wordpress-plugin/v1.3.0/README.md).
 
-On first load after the update, only Level 1 task text and completion checkmarks are migrated from the previous record. The app then saves this compact state for the current private browser session; other legacy records are not carried into the new app model.
+The exact v1.3.0 installer ZIP was delivered in the ChatGPT conversation. Do not use the earlier unverified GitHub base64 chunks; they were removed. The previous v1.2.0 and earlier implementation snapshots are preserved on their dated backup branches.
 
-## Releases and recovery
-
-- Current release notes: [WordPress plugin v1.2.0](wordpress-plugin/v1.2.0/README.md).
-- The installable v1.2.0 ZIP is delivered in the current ChatGPT conversation.
-- The branch `backup/eagle-structure-2026-11-13` preserves the previous v1.1.0 implementation before this simplification.
-- Original React/Firebase experiments remain in repository history; they are not the live WordPress app.
-
-## Storage note
-
-The app saves its state in WordPress under a private browser-session identity and keeps a local browser copy. Different browsers/devices do not automatically share progress. Keep the `/life/` page password enabled and change it from any temporary password.
+## Privacy and storage
+The page at `/life/` remains password-protected. Progress is stored in WordPress under a private browser-session identity; separate browsers/devices do not automatically share their session data.
