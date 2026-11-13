@@ -25,8 +25,8 @@ People/prospects, teams/wings, IBOs, activity log, Eagle Council, assistant, Fie
 
 On first load, the frontend migrates only the first legacy Level 1 task list and its completion checkmarks. It discards other legacy state fields and writes a compact task-only state for the current private browser session.
 
-## Source
+## Recovery
 
-The complete source for this release is backed up under [source-v1.2.0](../source-v1.2.0/). See that folder's README for reconstruction instructions.
+The installable WordPress plugin ZIP for v1.2.0 is attached in the ChatGPT conversation. The earlier implementation remains preserved on branch `backup/eagle-structure-2026-11-13`. This repository page documents the live release; the v1.2.0 installer itself is delivered as the downloadable ZIP in the current conversation.
 
 The active WordPress install was verified as version 1.2.0. The plugin code runs on the WordPress site; keep the page password protection enabled.
