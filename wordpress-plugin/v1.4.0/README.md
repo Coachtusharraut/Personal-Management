@@ -35,6 +35,6 @@ The app retains the previous task list and completion marks, and adds an empty j
 The exact v1.4.0 installable ZIP is attached in the ChatGPT conversation as eagle-structure-lifeos-v1.4.0.zip.
 
 SHA-256:
-ad4b4a32f888f4c641048e37d73555386af4a3fb48c817f7970da92d777fce98
+f65a7f0601a15c564641ed47130891764a95664807be6448d025460cf9623e47
 
 Previous implementation snapshots are preserved on the dated GitHub backup branches.
