@@ -1,39 +1,38 @@
-# LifeOS · Eagle Structure
+# Eagle Structure — LifeOS
 
-**One mission:** six team legs · ten Core IBOs in each · 3%+ per leg.
+**One mission:** complete meaningful tasks, build consistency, and turn progress into a visible journey.
 
 ## Live app
+
 https://coachtusharraut.com/life/
 
-The active WordPress plugin is **Eagle Structure LifeOS v1.1.0** on WordPress page `900135`. The page is password protected and does not appear in the public site navigation.
+The active WordPress plugin is **Eagle Structure LifeOS v1.2.0**. The page is password-protected and remains outside the public site navigation.
 
-The live WordPress edition stores app records in the WordPress database. It does not require Firebase.
+## What the app does now
 
-## Level 1
-**Motivational Interviewing Book Study**
+- One compact Eagle progress dashboard.
+- Level 1: **Motivational Interviewing Book Study**, seeded with eight starter quests.
+- Expandable tasks with their own progress indicators.
+- Tickable subtasks; add, edit and remove subtasks.
+- Add, edit and remove tasks.
+- Overall completion, XP and rank.
+- A story-driven Sahyadri fort map: completing each quest captures a fort and advances the campaign story.
+- Mobile-first layout.
 
-Eight bite-sized quests with tickable subtasks, XP and ranks. The quest outline is an editable starter; future levels and learning content are intentionally left for Coach Tushar to define rather than guessed.
+## What was deliberately removed
 
-## v1.1.0
-- Emoji-labelled six wings.
-- Edit and delete people/IBO entries.
-- Cascade linked edits and deletes across pipeline, IBO and related activity records.
-- Level 1 quest/subtask board.
-- XP and six visible ranks.
-- Last-ten-change undo/redo.
-- In-app Field Guide.
-- Eagle Assistant local command helper with preview/apply/undo for supported structural changes.
+The older people/prospect pipeline, teams/wings, IBO tracking, activity logs, Eagle Council, assistant, history/undo, Field Guide and backup/restore screens are not part of this simplified app. The new saved state model contains only Level 1 and its tasks/subtasks.
 
-**AI status:** the assistant is not connected to a generative model yet. It currently parses a limited set of explicit local commands. No AI-provider API key is configured.
+On first load after the update, only Level 1 task text and completion checkmarks are migrated from the previous record. The app then saves the compact state for the current private browser session; other legacy records are not carried into the new app model.
 
-## WordPress plugin recovery
-The exact v1.1.0 installable ZIP is archived as ten base64 text parts in:
+## Release source and recovery
 
-`wordpress-plugin/installer-v1.1.0/`
+- Current source archive: [wordpress-plugin/source-v1.2.0](wordpress-plugin/source-v1.2.0/)
+- Release notes: [v1.2.0 README](wordpress-plugin/v1.2.0/README.md)
+- The branch `backup/eagle-structure-2026-11-13` preserves the previous v1.1.0 implementation before this simplification.
+- Original React/Firebase experiments remain in repository history; they are not the live WordPress app.
 
-See [the v1.1.0 recovery guide](wordpress-plugin/installer-v1.1.0/README.md). Reconstruct it with the command there and verify the supplied SHA-256 before reinstalling.
+## Storage note
 
-The original React/Firebase implementation remains in this repository for future development. It is not the live WordPress edition.
+The app stores its state in WordPress under a private browser-session identity and keeps a local browser copy. Different browsers/devices do not automatically share progress. The `/life/` page password should remain enabled and should be changed from any temporary password.
 
-## Data/device note
-The current WordPress version uses a per-browser private session identity (up to 30 days). It does not auto-sync records between separate browsers/devices. Use the app's Export Backup / Restore to move records between devices and keep a separate copy.
