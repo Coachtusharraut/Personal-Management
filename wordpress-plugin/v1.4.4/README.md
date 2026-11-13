@@ -23,6 +23,6 @@ All v1.4.3 campaign visuals, mobile layout, dynamic fort map, missions, checkmar
 ## Installer
 Exact plugin package delivered in the current ChatGPT conversation: `eagle-structure-lifeos-v1.4.4.zip`.
 
-SHA-256: `ad0327895437c0c631697049dd0b245bf139d11865314d4e3fefb687d104b36d`
+SHA-256: `a7f3a1b3b8d008b425b460529d605a2c4980c92c137cc95cdd5f534777e1ed43`
 
 The v1.4.3 code remains preserved on `backup/eagle-structure-2026-11-13-v1.4.3`.
