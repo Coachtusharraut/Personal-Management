@@ -1,24 +1,30 @@
 # Eagle Structure — LifeOS
 
 **Live app:** https://coachtusharraut.com/life/  
-**Current release:** Eagle Structure LifeOS v1.5.3  
+**Current release:** Eagle Structure LifeOS v1.5.4  
 **Canonical Git branch:** `main`
 
 This repository is the source of truth for the current LifeOS project. The previous Personal Management prototype remains recoverable in Git history.
 
 ## Current product
 
-Eagle Structure LifeOS is a private dashboard for the Sahyadri campaign, recursive missions and subtasks, partner network/PV tracking, attachments, YouTube resources, potential-partner follow-up, and the Life & Business Logbook.
+Eagle Structure LifeOS is a private dashboard for tasks and nested subtasks, a real LOS partner hierarchy/PV tracker, a separate potential-partner pipeline, a Personal Assets vault, in-app resources and the Life & Business logbook.
 
-The live WordPress page is protected by its existing LifeOS password. The current v1.5.3 release adds an independent potential-partner pipeline without changing the actual partner tree.
+The live WordPress page remains password-protected. Version 1.5.4 separates LOS, Potential Partners and Personal Assets into independent views.
 
-## v1.5.3 potential-partner pipeline
+## v1.5.4 highlights
 
-- The Partner Network Add leg button is now plus-only.
-- The people icon opens the Potential Partners manager.
-- Each prospect has a name, notes and one follow-up state: green (Add to LOS), yellow (Need to contact), red (Contacted and declined).
-- The full partner graph shows a separate prospect rail on the far left.
-- Prospects remain outside the real partner hierarchy. They do not affect legs, partner count, PV, GPV, PIN qualification or downlines.
-- Prospect data is stored in the shared LifeOS state and syncs across devices.
+- Independent full-width views for LOS and Potential Partners; prospects do not enter the real hierarchy or affect PV, GPV, PINs or downlines.
+- Four configurable prospect stages: Need to contact, No reply yet, Ready to start and Said no. Names and colours can be changed.
+- Personal Assets for Self Talk, notes and private PDFs.
+- Task PDF previews and webpage reader with an optional open-outside link.
+- LOS partner information panels for phone, email, work, city, family/kids, notes and dated updates.
+- Up/down and level-change controls for tasks, subtasks and LOS partners.
+- Curved Sahyadri route with simple fort labels and one moving eagle marker.
+- Compact dashboard controls and removal of the First Flight/rank label and decorative eye/help control.
 
-See [v1.5.3 release notes](wordpress-plugin/v1.5.3/README.md) and [GIT_RELEASE_POLICY.md](GIT_RELEASE_POLICY.md).
+See [v1.5.4 release notes](wordpress-plugin/v1.5.4/README.md), [release manifest](wordpress-plugin/v1.5.4/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.4/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
+
+## Previous release
+
+See [v1.5.3 release notes](wordpress-plugin/v1.5.3/README.md) for the earlier prospect rail release.
