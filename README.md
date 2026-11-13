@@ -1,30 +1,21 @@
 # Eagle Structure — LifeOS
 
 **Live app:** https://coachtusharraut.com/life/  
-**Current release:** Eagle Structure LifeOS v1.5.7  
+**Current release:** Eagle Structure LifeOS v1.5.8  
 **Canonical Git branch:** `main`
 
 This repository is the source of truth for the current LifeOS project. The previous Personal Management prototype remains recoverable in Git history.
 
 ## Current product
+Eagle Structure LifeOS is a private mobile-first dashboard for Sahyadri fort milestones, recursive tasks, archiving, LOS, potential partners, Personal Assets, the Life & Business logbook and daily growth.
 
-Eagle Structure LifeOS is a private mobile-first dashboard for Sahyadri fort milestones, recursive tasks and subtasks, completed-task archiving, a real LOS partner hierarchy/PV tracker, a separate potential-partner pipeline, personal assets, the Life & Business logbook and daily growth.
+## v1.5.8 mobile polish
+- Fort names automatically size their label and shrink the text to stay inside the label on mobile.
+- Improved fort-name contrast and label background.
+- Removed the numeric badges from top-right menu items so counts no longer crowd or hide behind the menu control.
+- Existing tasks, archives, milestones, partner records and other saved app data remain on the same state schema.
 
-The live WordPress page remains password-protected.
+## Google Calendar
+Optional time-based tasks retain their Google Calendar handoff link. Automatic background event creation is not enabled because Google account OAuth consent and Calendar write permission have not been granted. An email address alone cannot authorize calendar writes.
 
-## v1.5.7 highlights
-
-- Removed the duplicate middle Sahyadri map. One map remains at the top of the dashboard.
-- Groups active tasks into up to five named fort milestones, targeting about four tasks per fort: Rajgad, Torna, Sinhagad, Purandar and Raigad.
-- The fort counter now shows completed milestones, not individual tasks.
-- Removed the floating eagle from the route to keep fort names readable on a phone.
-- Completed tasks can be archived from their task card, viewed in Archived Tasks, restored or permanently deleted.
-- Archive records are protected from stale-device re-creation when older copies sync.
-- Partner cards use a colour tied to their current PIN percentage tier.
-- Added a simple Documentation page in the top-right menu.
-
-See [v1.5.7 release notes](wordpress-plugin/v1.5.7/README.md), [release manifest](wordpress-plugin/v1.5.7/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.7/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
-
-## Previous release
-
-See [v1.5.6 release notes](wordpress-plugin/v1.5.6/README.md) for the map-first mobile dashboard, personal-growth star and Calendar handoff.
+See [v1.5.8 release notes](wordpress-plugin/v1.5.8/README.md), [release manifest](wordpress-plugin/v1.5.8/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.8/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
