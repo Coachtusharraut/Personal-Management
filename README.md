@@ -1,28 +1,28 @@
 # Eagle Structure — LifeOS
 
-**One mission:** complete meaningful tasks, see your progress, and advance a story through the Sahyadri.
+**One mission:** grow through a gamified Sahyadri campaign and close the loop on daily life and business actions.
 
 ## Live app
 https://coachtusharraut.com/life/
 
-The active WordPress plugin is **Eagle Structure LifeOS v1.3.0**. The page is published, password-protected and outside the public site navigation.
+The active WordPress plugin is **Eagle Structure LifeOS v1.4.0**. The page remains published and password-protected.
 
-## Current experience
-- Compact Eagle dashboard with live completion, task/step totals and XP.
-- Level 1: Motivational Interviewing Book Study.
-- Editable tasks and checkable subtasks.
-- Dynamic campaign map: one fort marker per current task.
-- Fort capture, eagle flight, animated victory effects, a short chime and optional vibration.
+## Home: Eagle Campaign
+- Bright golden sunrise theme with an illustrated eagle and Sahyadri fort.
+- Full-width responsive layout.
+- Live progress, mission count, subtask count, XP and rank.
+- Dynamic fort map, task/subtask checklist editing, capture animations and sounds.
+- No placeholder Level 2 or future-level label.
 
-Every add/edit/remove/check action recalculates the task list, counters, progress and campaign map. Completing all subtasks in a task captures its fort.
+## Menu: Life & Business
+A separate logbook captures Daily Plans, Business, Sales Calls, Meetings, Health & Energy, Learning, Content, Personal Growth, Finance and Other.
 
-## Deliberately excluded
-People, teams, IBOs, activity logs, Eagle Council, assistant, Field Guide, history/undo and other business-management screens remain removed.
+Each entry stores the date, notes, outcome, next action, follow-up date and open/closed status. The loop is: Capture → Action → Outcome → Follow-up → Close.
 
-## Release notes
-See [WordPress plugin v1.3.0](wordpress-plugin/v1.3.0/README.md).
+See wordpress-plugin/v1.4.0/README.md for release notes.
 
-The exact v1.3.0 installer ZIP was delivered in the ChatGPT conversation. Do not use the earlier unverified GitHub base64 chunks; they were removed. The previous v1.2.0 and earlier implementation snapshots are preserved on their dated backup branches.
+## AI status
+Structured logbook capture is live; a generative AI connection is not. Automatic capture from ChatGPT conversations, call transcripts, reminders and AI analysis need a future integration.
 
-## Privacy and storage
-The page at `/life/` remains password-protected. Progress is stored in WordPress under a private browser-session identity; separate browsers/devices do not automatically share their session data.
+## Recovery
+The exact v1.4.0 installer was delivered in the ChatGPT conversation. The previous v1.3.0, v1.2.0 and pre-simplification snapshots are kept on dated backup branches.
