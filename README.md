@@ -1,40 +1,39 @@
 # LifeOS · Eagle Structure
 
-**The single mission:** Build six team legs, each with ten Core IBOs, with every leg reaching 3%+.
+**One mission:** six team legs · ten Core IBOs in each · 3%+ per leg.
 
-## Live WordPress edition
+## Live app
+https://coachtusharraut.com/life/
 
-The currently installed app runs directly on the WordPress site at:
+The active WordPress plugin is **Eagle Structure LifeOS v1.1.0** on WordPress page `900135`. The page is password protected and does not appear in the public site navigation.
 
-- https://coachtusharraut.com/life/
-- WordPress page ID: `900135`
-- Plugin: **Eagle Structure LifeOS v1.0.0**
-- Storage: WordPress database (no Firebase required)
-- Access: password-protected page
+The live WordPress edition stores app records in the WordPress database. It does not require Firebase.
 
-The WordPress plugin is in `wordpress-plugin/`. The exact installable ZIP is archived as base64 parts in `wordpress-plugin/installer-b64/`. Follow `wordpress-plugin/README.md` to reconstruct it and verify the SHA-256 before installing.
+## Level 1
+**Motivational Interviewing Book Study**
 
-## What the app tracks
+Eight bite-sized quests with tickable subtasks, XP and ranks. The quest outline is an editable starter; future levels and learning content are intentionally left for Coach Tushar to define rather than guessed.
 
-- Six team wings.
-- Ten Core IBOs per wing.
-- 3%+ qualification target per wing.
-- Core IBO status requires all three: meeting attended, booking made and business active.
-- Unlimited people / conversations, pipeline stages, bookings, meetings, follow-ups and business activities.
-- Eagle progress, Eagle Council characters, celebration and setback feedback.
-- JSON export and restore from Settings.
+## v1.1.0
+- Emoji-labelled six wings.
+- Edit and delete people/IBO entries.
+- Cascade linked edits and deletes across pipeline, IBO and related activity records.
+- Level 1 quest/subtask board.
+- XP and six visible ranks.
+- Last-ten-change undo/redo.
+- In-app Field Guide.
+- Eagle Assistant local command helper with preview/apply/undo for supported structural changes.
 
-## Data and recovery
+**AI status:** the assistant is not connected to a generative model yet. It currently parses a limited set of explicit local commands. No AI-provider API key is configured.
 
-The WordPress edition stores data in the WordPress database under a private browser-session key. The session lasts up to 30 days. It does not automatically merge data between different browsers/devices, so export a JSON backup periodically and restore it on the other device when needed.
+## WordPress plugin recovery
+The exact v1.1.0 installable ZIP is archived as ten base64 text parts in:
 
-Two recovery locations are maintained in this repository:
+`wordpress-plugin/installer-v1.1.0/`
 
-- Working branch: `tushar-lifeos`
-- Dated recovery branch: `backup/eagle-structure-2026-11-13`
+See [the v1.1.0 recovery guide](wordpress-plugin/installer-v1.1.0/README.md). Reconstruct it with the command there and verify the supplied SHA-256 before reinstalling.
 
-Both contain the original React/Firebase project, the WordPress installer archive parts and the recovery instructions.
+The original React/Firebase implementation remains in this repository for future development. It is not the live WordPress edition.
 
-## Original React/Firebase edition
-
-The React/Firebase code is retained for future development or an alternate deployment. Firebase is not used by the current WordPress edition. Its deployment workflow is manual-only because it requires a Firebase service-account secret.
+## Data/device note
+The current WordPress version uses a per-browser private session identity (up to 30 days). It does not auto-sync records between separate browsers/devices. Use the app's Export Backup / Restore to move records between devices and keep a separate copy.
