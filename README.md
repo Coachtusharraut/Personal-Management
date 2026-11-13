@@ -1,20 +1,20 @@
 # Eagle Structure — LifeOS
 
 **Live app:** https://coachtusharraut.com/life/  
-**Current release:** Eagle Structure LifeOS v1.5.14  
+**Current release:** Eagle Structure LifeOS v1.5.15  
 **Canonical Git branch:** `main`
 
 Eagle Structure LifeOS is a private, mobile-first dashboard for Sahyadri fort milestones, recursive tasks, archiving, LOS, potential partners, Personal Assets, the Life & Business logbook and daily growth.
 
-## v1.5.14 — Daily Growth resources and unified Instant Assets
+## v1.5.15 — Blank LOS slots and personal customization
 
-- Daily Growth tasks now support notes, YouTube/web links and file attachments, like normal tasks.
-- A small 📎 control expands/collapses a task's resources. YouTube plays in LifeOS; PDFs, images, audio and supported videos open in the in-app preview; webpages use the in-app reader with an external fallback.
-- Personal Assets is now one combined **Instant Assets** library with a single add control for Self Talk, notes, PDFs, videos, audio, images, YouTube and webpage links.
-- Existing Self Talk, note and PDF entries are retained and shown together. The update changes their presentation, not their saved content.
-- Shared state schema is version 13; attachments continue to use the existing private, page-password-authorised WordPress store.
+- Add a blank reminder slot anywhere in the LOS hierarchy. Fill it later to convert it into a real partner.
+- Blank slots are excluded from people counts, PV, GPV, PIN qualification and downline totals.
+- Customize the colour and label for three LOS categories: Pin 3% and above (green by default), below 3%, and blank slots.
+- Customize the top-right menu: rename labels, change emojis, show/hide built-in destinations and reorder them. The underlying destination actions remain unchanged.
+- Existing partner records, Personal Assets, tasks, prospects and journal data are retained.
 
-See [release notes](wordpress-plugin/v1.5.14/README.md), [release manifest](wordpress-plugin/v1.5.14/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.14/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
+See [v1.5.15 release notes](wordpress-plugin/v1.5.15/README.md), [release manifest](wordpress-plugin/v1.5.15/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.15/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
 
 ## Previous release
-See [v1.5.13 release notes](wordpress-plugin/v1.5.13/README.md) for the in-app YouTube Full screen / Minimise control.
+See [v1.5.14 release notes](wordpress-plugin/v1.5.14/README.md) for Daily Growth resources and the unified Instant Assets library.
