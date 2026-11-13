@@ -1,9 +1,6 @@
 name: "Deploy LifeOS to Firebase Hosting"
 
 on:
-  push:
-    branches:
-      - tushar-lifeos
   workflow_dispatch:
 
 concurrency:
