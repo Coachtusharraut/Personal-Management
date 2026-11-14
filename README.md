@@ -1,22 +1,23 @@
 # Eagle Structure — LifeOS
 
-**Live app:** https://coachtusharraut.com/life/  
-**Currently deployed release:** Eagle Structure LifeOS v1.5.15  
+**Live app:** https://coachtusharraut.com/tsr/  
+**Currently deployed release:** Eagle Structure LifeOS v1.5.14  
 **Canonical Git branch:** `main`
 
 Eagle Structure LifeOS is a private, mobile-first dashboard for Sahyadri fort milestones, recursive tasks, archiving, LOS, potential partners, Personal Assets, the Life & Business logbook and daily growth.
 
-## Current deployment — rollback to v1.5.15
+## Current deployment — restored v1.5.14
 
-On 14 November 2026, the live plugin was restored to the exact archived v1.5.15 installer after later v1.5.16–v1.5.18 startup changes continued to leave the mobile app on the eagle/restore screen.
+On 14 November 2026, the live WordPress plugin was restored to the exact archived **v1.5.14** installer and the existing LifeOS page was moved to the new `/tsr/` address.
 
-- WordPress confirms Eagle Structure LifeOS **v1.5.15 active**.
-- The restored archive was verified: correct plugin directory, v1.5.15 header, assets present and ZIP integrity passed.
-- The rollback replaces plugin files only. It does not intentionally reset shared LifeOS state.
-- Do not reinstall v1.5.16, v1.5.17 or v1.5.18 until the mobile cold-start issue is diagnosed and verified on-device.
+- WordPress confirms Eagle Structure LifeOS **v1.5.14 active**.
+- The exact installer checksum matches the v1.5.14 release manifest.
+- The original protected page ID `900135` was retained and its slug changed from `life` to `tsr`, preserving the page-password check used by v1.5.14.
+- The temporary `/tar/` page was moved to Trash.
+- No site reset or shared-state deletion was performed.
 
-See [rollback record](DEPLOYMENT_ROLLBACK.md), [v1.5.15 release notes](wordpress-plugin/v1.5.15/README.md), [v1.5.15 release manifest](wordpress-plugin/v1.5.15/RELEASE_MANIFEST.md) and [v1.5.15 source change record](wordpress-plugin/v1.5.15/SOURCE_CHANGESET.md).
+See [deployment restoration record](DEPLOYMENT_ROLLBACK.md), [v1.5.14 release notes](wordpress-plugin/v1.5.14/README.md), [release manifest](wordpress-plugin/v1.5.14/RELEASE_MANIFEST.md) and [source change record](wordpress-plugin/v1.5.14/SOURCE_CHANGESET.md).
 
 ## Repository note
 
-The versioned installable plugin package is archived separately from this documentation tree. The GitHub release directories contain release notes, manifests and source-change records; they do not contain every raw PHP, JavaScript, CSS and image asset as individual files.
+The complete installable plugin source and assets are contained in the versioned v1.5.14 ZIP archived in the project Library. The GitHub release folder contains release notes, manifest and source-change record; the raw plugin source files are not committed individually in this repository snapshot.
