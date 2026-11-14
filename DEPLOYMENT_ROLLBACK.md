@@ -1,33 +1,31 @@
-# Live deployment rollback — 14 November 2026
+# LifeOS restoration — v1.5.14 at /tsr/
 
-## Result
+**Date:** 14 November 2026  
+**Site:** https://coachtusharraut.com  
+**App URL:** https://coachtusharraut.com/tsr/  
+**Plugin:** Eagle Structure LifeOS v1.5.14
 
-The live WordPress site `https://coachtusharraut.com` was rolled back from Eagle Structure LifeOS v1.5.18 to the exact archived **v1.5.15** installer.
+## Exact installer
 
-## Exact installer used
+- Archive: `eagle-structure-lifeos-v1.5.14.zip`
+- SHA-256: `a696e2998623adc3b176944239e4b687ffa6f7f451ceebdd1b24ec8accd897a2`
+- Size: 772,118 bytes
+- ZIP integrity: passed
+- Plugin header and runtime constant: `1.5.14`
+- WordPress plugin status after install: active
 
-- Archive: `eagle-structure-lifeos-v1.5.15.zip`
-- Archive SHA-256: `157f1388d5442ef50bc7e1ae939373d20c7a9766d7d266a23c223dee4c8eb6b8`
-- Archive size: 776,079 bytes
-- Plugin header verified: `1.5.15`
-- ZIP test: passed
-- Plugin directory: `eagle-structure-lifeos/`
-- WordPress post-install check: version `1.5.15`, status `active`, no update available.
+## Page address
 
-## Reason
+- Original protected WordPress page ID: `900135`
+- Slug changed from `life` to `tsr`; the ID was retained because v1.5.14 checks this ID for its password and app scope.
+- Page remains published, uses the blank template, and retains the LifeOS shortcode and existing password protection.
+- The temporary page `/tar/` (ID `900276`) was moved to Trash.
+- The old `/life/` route is no longer published.
 
-The user's Android phone continued to show the eagle-only loading screen for approximately 30 seconds, then displayed the startup recovery panel. The later startup releases (v1.5.16–v1.5.18) did not resolve the observed on-device cold-start failure. The user explicitly requested a restoration of v1.5.15.
+## Rollback scope
 
-The precise failing HTTP request or JavaScript exception from the phone has not been captured, so the root cause is still undiagnosed. This rollback restores the known earlier plugin build; it is not a claim that the original cold-start issue has been conclusively root-caused.
+The live plugin files are restored to v1.5.14. The later v1.5.15–v1.5.18 plugin changes are no longer active. The GitHub release index and release folders after v1.5.14 were removed from the active branch tree to match the restored deployment.
 
-## Data safety
+The shared LifeOS WordPress state was not reset. Tasks, partner records, attachments, personal assets and other saved content remain in the existing shared store. This is a code/page rollback, not a historical database restore. Fields introduced after v1.5.14 may be ignored by the older version.
 
-The plugin files were overwritten through the WordPress plugin installer. The shared LifeOS workspace is stored separately from the plugin package; no site reset, database reset or shared-state deletion was performed.
-
-## Verification limits
-
-WordPress plugin listing confirmed v1.5.15 active. A fresh WordPress screenshot capture returned ready, but it did not test the user's authenticated mobile session. The final functional check must be performed by opening the app on the user's Android device.
-
-## Source availability
-
-The exact archived v1.5.15 installer remains in the user's project Library and is checksum-identified above. This repository contains deployment/release documentation; it does not store the complete raw plugin source as individual tracked files.
+The original ZIP archives remain in the project Library as recovery copies. Git commit history and prior conversation messages cannot be erased by this deployment rollback.
