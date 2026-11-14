@@ -1,23 +1,22 @@
 # Eagle Structure — LifeOS
 
 **Live app:** https://coachtusharraut.com/life/  
-**Current release:** Eagle Structure LifeOS v1.5.18  
+**Currently deployed release:** Eagle Structure LifeOS v1.5.15  
 **Canonical Git branch:** `main`
 
 Eagle Structure LifeOS is a private, mobile-first dashboard for Sahyadri fort milestones, recursive tasks, archiving, LOS, potential partners, Personal Assets, the Life & Business logbook and daily growth.
 
-## v1.5.18 — cold-start recovery
+## Current deployment — rollback to v1.5.15
 
-- Keep the loading screen eagle-only. No “Opening your saved LifeOS...” text while the app is loading.
-- Remove the short timed fallback that could replace the eagle screen while a slow but valid cloud request was still running.
-- Allow up to 120 seconds for the initial shared-state read and retry transient failures up to three times.
-- If a local backup exists, render it immediately and keep LifeOS usable offline if the cloud is unavailable.
-- Never write local/default data over the shared cloud record until a fresh cloud read succeeds.
-- Reconcile offline local edits with the shared workspace before enabling cloud writes.
-- Refresh a stale WordPress nonce once after an authorization failure, without creating a reload loop.
-- Preload essential app CSS/JS and exclude the large hero image from service-worker installation precache.
+On 14 November 2026, the live plugin was restored to the exact archived v1.5.15 installer after later v1.5.16–v1.5.18 startup changes continued to leave the mobile app on the eagle/restore screen.
 
-See [v1.5.18 release notes](wordpress-plugin/v1.5.18/README.md), [release manifest](wordpress-plugin/v1.5.18/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.18/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
+- WordPress confirms Eagle Structure LifeOS **v1.5.15 active**.
+- The restored archive was verified: correct plugin directory, v1.5.15 header, assets present and ZIP integrity passed.
+- The rollback replaces plugin files only. It does not intentionally reset shared LifeOS state.
+- Do not reinstall v1.5.16, v1.5.17 or v1.5.18 until the mobile cold-start issue is diagnosed and verified on-device.
 
-## Previous release
-See [v1.5.17 release notes](wordpress-plugin/v1.5.17/README.md) for the previous startup-recovery implementation.
+See [rollback record](DEPLOYMENT_ROLLBACK.md), [v1.5.15 release notes](wordpress-plugin/v1.5.15/README.md), [v1.5.15 release manifest](wordpress-plugin/v1.5.15/RELEASE_MANIFEST.md) and [v1.5.15 source change record](wordpress-plugin/v1.5.15/SOURCE_CHANGESET.md).
+
+## Repository note
+
+The versioned installable plugin package is archived separately from this documentation tree. The GitHub release directories contain release notes, manifests and source-change records; they do not contain every raw PHP, JavaScript, CSS and image asset as individual files.
