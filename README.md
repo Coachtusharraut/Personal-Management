@@ -1,23 +1,23 @@
 # Eagle Structure — LifeOS
 
 **Live app:** https://coachtusharraut.com/life/  
-**Current release:** Eagle Structure LifeOS v1.5.17  
+**Current release:** Eagle Structure LifeOS v1.5.18  
 **Canonical Git branch:** `main`
 
 Eagle Structure LifeOS is a private, mobile-first dashboard for Sahyadri fort milestones, recursive tasks, archiving, LOS, potential partners, Personal Assets, the Life & Business logbook and daily growth.
 
-## v1.5.17 startup recovery
+## v1.5.18 — cold-start recovery
 
-- Cold starts immediately render the app shell instead of leaving only the flying eagle visible while the first cloud request is pending.
-- A local backup is rendered immediately when available, then reconciled with the shared cloud state.
-- If there is no local backup, a visible restore screen appears while the app fetches the cloud workspace.
-- If cloud loading fails on a cold start, LifeOS shows a retry screen instead of an endless animation.
-- Starter/default data is never posted over the shared cloud state merely because the initial cloud read failed.
-- Unexpected startup exceptions recover to the local backup when possible.
-- Cloud read timeout is eight seconds.
-- A PHP-rendered fallback provides a reload action if the application JavaScript fails to start at all.
+- Keep the loading screen eagle-only. No “Opening your saved LifeOS...” text while the app is loading.
+- Remove the short timed fallback that could replace the eagle screen while a slow but valid cloud request was still running.
+- Allow up to 120 seconds for the initial shared-state read and retry transient failures up to three times.
+- If a local backup exists, render it immediately and keep LifeOS usable offline if the cloud is unavailable.
+- Never write local/default data over the shared cloud record until a fresh cloud read succeeds.
+- Reconcile offline local edits with the shared workspace before enabling cloud writes.
+- Refresh a stale WordPress nonce once after an authorization failure, without creating a reload loop.
+- Preload essential app CSS/JS and exclude the large hero image from service-worker installation precache.
 
-See [v1.5.17 release notes](wordpress-plugin/v1.5.17/README.md), [release manifest](wordpress-plugin/v1.5.17/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.17/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
+See [v1.5.18 release notes](wordpress-plugin/v1.5.18/README.md), [release manifest](wordpress-plugin/v1.5.18/RELEASE_MANIFEST.md), [source change record](wordpress-plugin/v1.5.18/SOURCE_CHANGESET.md) and [Git release policy](GIT_RELEASE_POLICY.md).
 
 ## Previous release
-See [v1.5.16 release notes](wordpress-plugin/v1.5.16/README.md) for the local-first loading and PWA improvements.
+See [v1.5.17 release notes](wordpress-plugin/v1.5.17/README.md) for the previous startup-recovery implementation.
